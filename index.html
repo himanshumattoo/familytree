@@ -25,10 +25,27 @@
     margin: 0;
   }
 </style>
+  <style>
+  .scroll-wrapper {
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    height: 100vh;
+    white-space: nowrap;
+  }
+
+  #tree-simple {
+    width: 2400px; /* Adjust width based on your tree size */
+    height: 100%;
+    display: inline-block;
+  }
+</style>
 </head>
 <body>
   <h2 style="text-align:center">Kachroo Family Tree (Gen 1 to Gen 3)</h2>
+<div class="scroll-wrapper">
   <div id="tree-simple"></div>
+</div>
 
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>

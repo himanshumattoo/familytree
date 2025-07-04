@@ -6,7 +6,7 @@ const familyConfig = {
     node: { collapsable: true }
   },
   nodeStructure: {
-    text: { name: "Pandit Shambhu Kachroo\n& Sobhagyawati" },
+    text: { name: "Pandit Shambhu Kachroo<br>& Sobhagyawati" },
     children: [
       {
         text: { name: "Uday Chandan Kachroo\n+ Lalita" },
@@ -44,7 +44,7 @@ const familyConfig = {
         ]
       },
       {
-        text: { name: "Janwanti (Jygree)\n+ Omkar Nath Dhar" },
+        text: { name: "Janwanti (Jygree)<br>& Omkar Nath Dhar" },
         children: [
           { text: { name: "Sarojni Sarla Kaul\n+ Deepak" } },
           { text: { name: "Shashi Kaul\n+ Ramesh Kaul" } },
@@ -53,7 +53,7 @@ const familyConfig = {
         ]
       },
       {
-        text: { name: "Dilaram Kachroo (Bobuji)\n+ Mohini" },
+        text: { name: "Dilaram Kachroo (Bobuji)<br>& Mohini" },
         children: [
           { text: { name: "Leela Dhar K." } },
           { text: { name: "Gayatri" } },
@@ -61,7 +61,7 @@ const familyConfig = {
         ]
       },
       {
-        text: { name: "Ishwer Chander Kachroo\n+ Pitabi" },
+        text: { name: "Ishwer Chander Kachroo<br>& Pitabi" },
         children: [
           { text: { name: "Suman K.\n+ Ray Hoffpfieur" } },
           { text: { name: "Sachin K. (Raja)\n+ Pooja" } }

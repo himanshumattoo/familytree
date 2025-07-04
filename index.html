@@ -1,1 +1,99 @@
-<h1>Hello!</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kachroo Family Tree</title>
+
+  <!-- Treant.js and dependencies -->
+  <link rel="stylesheet" href="treant.css" />
+  <style>
+    #tree-simple {
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center">Kachroo Family Tree (Gen 1 to Gen 3)</h2>
+  <div id="tree-simple"></div>
+
+  <script src="raphael.min.js"></script>
+  <script src="Treant.js"></script>
+  <script>
+    const familyConfig = {
+      chart: {
+        container: "#tree-simple",
+        rootOrientation: "NORTH",
+        connectors: { type: "step" },
+        node: { collapsable: true }
+      },
+      nodeStructure: {
+        text: { name: "Pandit Shambhu Kachroo\n& Sobhagyawati" },
+        children: [
+          {
+            text: { name: "Uday Chandan Kachroo\n+ Lalita" },
+            children: [
+              { text: { name: "Tej Bahadur K.\n+ Beena" } },
+              { text: { name: "Prakash (Beema)\n+ Ashok Tickoo" } },
+              { text: { name: "Ravinder K.\n+ Nimmi" } },
+              { text: { name: "Indra (Jiji)\n+ Rashinder Trisal" } },
+              { text: { name: "Savita Narayan K.\n+ Jeenak" } }
+            ]
+          },
+          {
+            text: { name: "Naginder Mohan Kachroo\n+ Rani" },
+            children: [
+              { text: { name: "Romesh (Sabtoth)\n+ Irene" } },
+              { text: { name: "Vijay (Beenua)" } },
+              { text: { name: "Bal Krishan (BK)" } }
+            ]
+          },
+          {
+            text: { name: "Rajdulari (Dida)\n+ Trilok Moza" },
+            children: [
+              { text: { name: "Kanaya Lal Moza\n+ Veera" } },
+              { text: { name: "Asha Kaul\n+ Naresh" } },
+              { text: { name: "Virender Moza (Veerji)\n+ Vijanti" } },
+              { text: { name: "Meenakshi Moza (Kuku)" } }
+            ]
+          },
+          {
+            text: { name: "Sushil (Bengashi)\n+ Hidenath Pakmoo" },
+            children: [
+              { text: { name: "Renu Challu (Bala)\n+ Vijay Challu" } },
+              { text: { name: "Rita Parimoo (Billi)" } },
+              { text: { name: "Reeva Parimoo\n+ Rakesh Raina" } }
+            ]
+          },
+          {
+            text: { name: "Janwanti (Jygree)\n+ Omkar Nath Dhar" },
+            children: [
+              { text: { name: "Sarojni Sarla Kaul\n+ Deepak" } },
+              { text: { name: "Shashi Kaul\n+ Ramesh Kaul" } },
+              { text: { name: "Sudhir Dhar (Shaadi)\n+ Anita" } },
+              { text: { name: "Sujata Mattoo\n+ Tej K." } }
+            ]
+          },
+          {
+            text: { name: "Dilaram Kachroo (Bobuji)\n+ Mohini" },
+            children: [
+              { text: { name: "Leela Dhar K." } },
+              { text: { name: "Gayatri" } },
+              { text: { name: "Vidya Dhar K.\n+ Andrea" } }
+            ]
+          },
+          {
+            text: { name: "Ishwer Chander Kachroo\n+ Pitabi" },
+            children: [
+              { text: { name: "Suman K.\n+ Ray Hoffpfieur" } },
+              { text: { name: "Sachin K. (Raja)\n+ Pooja" } }
+            ]
+          }
+        ]
+      }
+    };
+    new Treant(familyConfig);
+  </script>
+</body>
+</html>

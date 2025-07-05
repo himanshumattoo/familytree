@@ -350,5 +350,12 @@ const familyConfig = {
     ]
   }
 };
+function collapseAll(node) {
+  if (node.children && node.children.length) {
+    node.collapsed = true;
+    node.children.forEach(collapseAll);
+  }
+}
+collapseAll(familyConfig.nodeStructure);
 
 new Treant(familyConfig);

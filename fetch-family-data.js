@@ -2,7 +2,7 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/<YOUR_SHEET_ID>/export?f
 
 async function loadFamilyTree() {
   try {
-    const response = await fetch(CSV_URL);
+    const response = await fetch(CSV_URL, { cache: 'no-store' });
     if (!response.ok) throw new Error('Network response was not ok');
     const csvText = await response.text();
     const rows = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;

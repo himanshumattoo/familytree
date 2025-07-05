@@ -1,4 +1,6 @@
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/<YOUR_SHEET_ID>/export?format=csv';
+// Published Google Sheets CSV URL
+const CSV_URL =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSNHNHGEBkBF4U9tbRg4ab-wpxgNdm32BDMAujsUlf1FReLWgftUEQHt8oVZ6ZG5CFWmgUT2JQ_NLiD/pub?gid=0&single=true&output=csv';
 
 async function loadFamilyTree() {
   try {

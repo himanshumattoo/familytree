@@ -49,14 +49,39 @@
   </style>
   <style>
     .Treant .collapse-switch {
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      border-radius: 50%;
+      background: #f2f2f2;
+      border: 1px solid #777;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      position: relative;
       transform: scale(1.4);
       cursor: pointer;
-      transition: transform 0.2s;
+      transition: transform 0.2s, background-color 0.2s;
     }
 
     .Treant .collapse-switch:hover {
       transform: scale(1.6);
       background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .Treant .collapse-switch::before,
+    .Treant .collapse-switch::after {
+      content: none;
+    }
+
+    .Treant .collapse-switch::after {
+      content: "\2212"; /* minus sign */
+    }
+
+    .Treant .node.collapsed > .collapse-switch::after {
+      content: "+";
     }
   </style>
 </head>

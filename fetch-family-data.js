@@ -1,8 +1,10 @@
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/<YOUR_SHEET_ID>/export?format=csv';
+// Published Google Sheets CSV URL
+const CSV_URL =
+  'https://docs.google.com/spreadsheets/d/e/2PACX-1vSNHNHGEBkBF4U9tbRg4ab-wpxgNdm32BDMAujsUlf1FReLWgftUEQHt8oVZ6ZG5CFWmgUT2JQ_NLiD/pub?gid=0&single=true&output=csv';
 
 async function loadFamilyTree() {
   try {
-    const response = await fetch(CSV_URL, { cache: 'no-store' });
+    const response = await fetch(CSV_URL);
     if (!response.ok) throw new Error('Network response was not ok');
     const csvText = await response.text();
     const rows = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
@@ -16,7 +18,7 @@ async function loadFamilyTree() {
       },
       nodeStructure: tree
     };
-    collapseAll(familyConfig.nodeStructure);
+    collapseChildren(familyConfig.nodeStructure);
     new Treant(familyConfig);
   } catch (err) {
     console.error('Failed to load family data', err);
@@ -55,10 +57,12 @@ function findParent(key, nodes) {
   return match ? nodes[match] : null;
 }
 
-function collapseAll(node) {
+function collapseChildren(node) {
   if (node.children && node.children.length) {
-    node.collapsed = true;
-    node.children.forEach(collapseAll);
+    node.children.forEach(child => {
+      child.collapsed = true;
+      collapseChildren(child);
+    });
   }
 }
 

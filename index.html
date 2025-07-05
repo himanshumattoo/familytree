@@ -35,9 +35,16 @@
   }
 
   #tree-simple {
-    width: 2400px; /* Adjust width based on your tree size */
+    width: 100%;
+    max-width: 2400px;
     height: 100%;
     display: inline-block;
+  }
+
+  @media (max-width: 768px) {
+    #tree-simple {
+      max-width: none;
+    }
   }
 </style>
 </head>

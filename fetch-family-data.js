@@ -20,13 +20,13 @@ async function loadFamilyTree() {
     };
     collapseChildren(familyConfig.nodeStructure);
     new Treant(familyConfig, () => {
-      document.querySelectorAll('#tree-simple .node').forEach(nodeEl => {
-        nodeEl.addEventListener('click', e => {
-          if (!e.target.classList.contains('collapse-switch')) {
-            const toggle = nodeEl.querySelector('.collapse-switch');
-            if (toggle) toggle.click();
-          }
-        });
+      const container = document.querySelector('#tree-simple');
+      container.addEventListener('click', e => {
+        const nodeEl = e.target.closest('.node');
+        if (nodeEl && !e.target.classList.contains('collapse-switch')) {
+          const toggle = nodeEl.querySelector('.collapse-switch');
+          if (toggle) toggle.click();
+        }
       });
     });
   } catch (err) {

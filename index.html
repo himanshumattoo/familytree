@@ -10,6 +10,8 @@
 
   <!-- Treant.js and dependencies -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fperucic/treant-js/Treant.css">
+  <!-- Font Awesome for collapse icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     #tree-simple {
       width: 100%;
@@ -87,11 +89,15 @@
     }
 
     .Treant .collapse-switch::after {
-      content: "\2212"; /* minus sign */
+      content: "\f068"; /* Font Awesome minus */
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
     }
 
     .Treant .node.collapsed > .collapse-switch::after {
-      content: "+";
+      content: "\f067"; /* Font Awesome plus */
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
     }
   </style>
 </head>

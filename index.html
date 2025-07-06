@@ -108,7 +108,12 @@
   </style>
   <style>
     .Treant .collapse-switch {
-      display: none;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .Treant .node:hover > .collapse-switch {
+      opacity: 1;
     }
   </style>
 </head>

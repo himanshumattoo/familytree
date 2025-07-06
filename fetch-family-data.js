@@ -19,7 +19,16 @@ async function loadFamilyTree() {
       nodeStructure: tree
     };
     collapseChildren(familyConfig.nodeStructure);
-    new Treant(familyConfig);
+    new Treant(familyConfig, () => {
+      document.querySelectorAll('#tree-simple .node').forEach(nodeEl => {
+        nodeEl.addEventListener('click', e => {
+          if (!e.target.classList.contains('collapse-switch')) {
+            const toggle = nodeEl.querySelector('.collapse-switch');
+            if (toggle) toggle.click();
+          }
+        });
+      });
+    });
   } catch (err) {
     console.error('Failed to load family data', err);
   }

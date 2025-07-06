@@ -35,6 +35,7 @@
     width: 100%;
     height: 100vh;
     white-space: nowrap;
+    touch-action: pan-x pinch-zoom;
   }
 
   #tree-simple {
@@ -47,6 +48,12 @@
   @media (max-width: 768px) {
     #tree-simple {
       max-width: none;
+      height: auto;
+    }
+
+    .Treant .node {
+      font-size: 0.875rem;
+      padding: 3px;
     }
   }
   </style>

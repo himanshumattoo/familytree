@@ -34,13 +34,25 @@ async function loadFamilyTree() {
   }
 }
 
+function createCard(row) {
+  const name = row['Name'] ? row['Name'].trim() : '';
+  const details = Object.keys(row)
+    .filter(k => k !== 'Name' && k !== 'Parent' && row[k] && row[k].trim())
+    .map(k => `<div><strong>${k}:</strong> ${row[k].trim()}</div>`) 
+    .join('');
+  return `
+    <div class="family-card">
+      <div class="card-name">${name}</div>
+      ${details}
+    </div>
+  `;
+}
+
 function buildHierarchy(rows) {
   const nodes = {};
   rows.forEach(row => {
     const name = row['Name'].trim();
-    const spouse = row['Spouse'] ? row['Spouse'].trim() : '';
-    const label = spouse ? `${name}\n+ ${spouse}` : name;
-    nodes[name] = { text: { name: label } };
+    nodes[name] = { innerHTML: createCard(row) };
   });
 
   let root = null;

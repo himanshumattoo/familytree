@@ -3,103 +3,399 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Family Tree</title>
+  <title>Kachroo Family Tree</title>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <!-- Treant.js and dependencies -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fperucic/treant-js/Treant.css">
-  <!-- Font Awesome for collapse icons -->
+  <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
   <style>
-    #tree-simple {
-      width: 100%;
-      height: 100vh;
-    }
-  </style>
-    <style>
-  .Treant .node {
-    text-align: center;
-    line-height: 1.3;
-    font-size: 1rem;
-    padding: 8px;
-    cursor: pointer;
-    background-color: #fff;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .Treant .node:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-  }
-
-  .Treant .node p {
-    margin: 0;
-  }
-</style>
-  <style>
-  .family-card .card-name {
-    font-weight: bold;
-  }
-
-  .family-card div + div {
-    margin-top: 2px;
-  }
-  </style>
-  <style>
-  .scroll-wrapper {
-    overflow-x: auto;
-    overflow-y: hidden;
-    width: 100%;
-    height: 100vh;
-    white-space: nowrap;
-    touch-action: pan-x pinch-zoom;
-  }
-
-  #tree-simple {
-    width: 100%;
-    max-width: 2400px;
-    height: 100%;
-    display: inline-block;
-  }
-
-  @media (max-width: 768px) {
-    #tree-simple {
-      max-width: none;
-      height: auto;
+    /* ── Reset & Base ── */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    .Treant .node {
-      font-size: 0.875rem;
-      padding: 6px;
-      cursor: pointer;
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background-color: #F8F9FA;
+      color: #1A1A2E;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
-  }
-  </style>
-  <style>
-    .Treant .collapse-switch {
-      width: 20px;
-      height: 20px;
-      line-height: 20px;
-      border-radius: 50%;
-      background: #f2f2f2;
-      border: 1px solid #777;
+
+    /* ── Header Bar ── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #FFFFFF;
+      border-bottom: 1px solid #E2E8F0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .header-icon {
+      width: 36px;
+      height: 36px;
+      background: #3D5A80;
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
-      font-size: 14px;
+      color: #fff;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #1A1A2E;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
+      color: #6C757D;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    /* ── Search ── */
+    .search-container {
       position: relative;
-      transform: scale(1.4);
+      width: 240px;
+    }
+
+    .search-container .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94A3B8;
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 32px 8px 34px;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      color: #1A1A2E;
+      background: #F8F9FA;
+      outline: none;
+      transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input::placeholder {
+      color: #94A3B8;
+    }
+
+    .search-input:focus {
+      border-color: #3D5A80;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(61, 90, 128, 0.1);
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #94A3B8;
       cursor: pointer;
-      transition: transform 0.2s, background-color 0.2s;
+      font-size: 12px;
+      padding: 4px;
+      display: none;
+      line-height: 1;
+    }
+
+    .search-clear:hover {
+      color: #64748B;
+    }
+
+    .search-container.has-value .search-clear {
+      display: block;
+    }
+
+    /* ── Stats Pills ── */
+    .stats-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      background: #F1F5F9;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #475569;
+      white-space: nowrap;
+    }
+
+    .stat-pill i {
+      font-size: 11px;
+      color: #3D5A80;
+    }
+
+    /* ── Breadcrumb ── */
+    .breadcrumb-bar {
+      background: #FFFFFF;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 8px 24px;
+      font-size: 0.8125rem;
+      color: #94A3B8;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      min-height: 36px;
+    }
+
+    .breadcrumb-bar.visible {
+      display: flex;
+    }
+
+    .breadcrumb-bar i {
+      font-size: 10px;
+    }
+
+    .breadcrumb-item {
+      color: #64748B;
+    }
+
+    .breadcrumb-item.active {
+      color: #3D5A80;
+      font-weight: 600;
+    }
+
+    .breadcrumb-sep {
+      color: #CBD5E1;
+    }
+
+    /* ── Loading State ── */
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 64px);
+      gap: 16px;
+    }
+
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #E2E8F0;
+      border-top-color: #3D5A80;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 0.875rem;
+      color: #94A3B8;
+      font-weight: 500;
+    }
+
+    /* ── Error State ── */
+    .error-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: calc(100vh - 64px);
+      gap: 12px;
+    }
+
+    .error-icon {
+      font-size: 2rem;
+      color: #E53E3E;
+    }
+
+    .error-message {
+      font-size: 0.875rem;
+      color: #64748B;
+    }
+
+    .error-retry {
+      margin-top: 4px;
+      padding: 8px 20px;
+      background: #3D5A80;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .error-retry:hover {
+      background: #2C4A6E;
+    }
+
+    /* ── Tree Scroll Container ── */
+    .scroll-wrapper {
+      overflow-x: auto;
+      overflow-y: auto;
+      width: 100%;
+      height: calc(100vh - 64px);
+      touch-action: pan-x pan-y pinch-zoom;
+      padding: 32px 24px 48px;
+    }
+
+    #tree-simple {
+      width: 100%;
+      max-width: 2400px;
+      height: 100%;
+      display: inline-block;
+    }
+
+    /* ── Treant Connector Lines ── */
+    .Treant > .node-connector {
+      border-color: #CBD5E1 !important;
+    }
+
+    /* ── Tree Nodes ── */
+    .Treant .node {
+      text-align: left;
+      line-height: 1.4;
+      font-size: 0.8125rem;
+      padding: 12px 16px;
+      cursor: pointer;
+      background-color: #FFFFFF;
+      border-radius: 10px;
+      border: 1px solid #E2E8F0;
+      border-left: 3px solid #3D5A80;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+      transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
+      min-width: 140px;
+      max-width: 220px;
+    }
+
+    .Treant .node:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+      transform: translateY(-1px);
+      border-left-color: #2C4A6E;
+    }
+
+    .Treant .node.search-match {
+      border-left-color: #2EC4B6;
+      box-shadow: 0 0 0 2px rgba(46, 196, 182, 0.25), 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .Treant .node.search-dimmed {
+      opacity: 0.35;
+    }
+
+    .Treant .node p {
+      margin: 0;
+    }
+
+    /* ── Generation Border Colors ── */
+    .Treant .node.gen-0 { border-left-color: #3D5A80; }
+    .Treant .node.gen-1 { border-left-color: #5B8FB9; }
+    .Treant .node.gen-2 { border-left-color: #2EC4B6; }
+    .Treant .node.gen-3 { border-left-color: #7C3AED; }
+    .Treant .node.gen-4 { border-left-color: #E67E22; }
+    .Treant .node.gen-5 { border-left-color: #E53E3E; }
+
+    /* ── Family Card ── */
+    .family-card .card-name {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #1A1A2E;
+      margin-bottom: 2px;
+    }
+
+    .family-card .card-detail {
+      font-size: 0.75rem;
+      color: #64748B;
+      line-height: 1.4;
+    }
+
+    .family-card .card-detail strong {
+      font-weight: 500;
+      color: #475569;
+    }
+
+    .family-card div + div {
+      margin-top: 2px;
+    }
+
+    /* ── Collapse Switch ── */
+    .Treant .collapse-switch {
+      width: 22px;
+      height: 22px;
+      line-height: 22px;
+      border-radius: 50%;
+      background: #F1F5F9;
+      border: 1px solid #CBD5E1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
+      transform: scale(1.2);
     }
 
     .Treant .collapse-switch:hover {
-      transform: scale(1.6);
-      background-color: rgba(0, 0, 0, 0.05);
+      transform: scale(1.4);
+      background-color: #E2E8F0;
+      opacity: 1;
+    }
+
+    .Treant .node:hover > .collapse-switch {
+      opacity: 1;
     }
 
     .Treant .collapse-switch::before,
@@ -108,40 +404,173 @@
     }
 
     .Treant .collapse-switch::after {
-      content: "\f068"; /* Font Awesome minus */
+      content: "\f068";
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      font-size: 9px;
+      color: #64748B;
+    }
+
+    .Treant .node.collapsed > .collapse-switch::after {
+      content: "\f067";
       font-family: "Font Awesome 6 Free";
       font-weight: 900;
     }
 
-  .Treant .node.collapsed > .collapse-switch::after {
-      content: "\f067"; /* Font Awesome plus */
-      font-family: "Font Awesome 6 Free";
-      font-weight: 900;
-    }
-  </style>
-  <style>
-    .Treant .collapse-switch {
-      opacity: 0.6;
-      transition: opacity 0.2s;
+    /* ── No Results Message ── */
+    .search-no-results {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1A1A2E;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 200;
     }
 
-    .Treant .node:hover > .collapse-switch {
-      opacity: 1;
+    .search-no-results.visible {
+      display: block;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .site-header {
+        padding: 0 16px;
+        height: 56px;
+        gap: 12px;
+      }
+
+      .header-title {
+        font-size: 0.9375rem;
+      }
+
+      .header-subtitle {
+        display: none;
+      }
+
+      .search-container {
+        width: 160px;
+      }
+
+      .stats-bar {
+        display: none;
+      }
+
+      .breadcrumb-bar {
+        padding: 6px 16px;
+        font-size: 0.75rem;
+      }
+
+      .scroll-wrapper {
+        height: calc(100vh - 56px);
+        padding: 20px 12px 40px;
+      }
+
+      #tree-simple {
+        max-width: none;
+        height: auto;
+      }
+
+      .Treant .node {
+        font-size: 0.75rem;
+        padding: 10px 12px;
+        min-width: 110px;
+        max-width: 180px;
+      }
+
+      .family-card .card-name {
+        font-size: 0.8125rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .search-container {
+        width: 120px;
+      }
+
+      .header-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        border-radius: 6px;
+      }
     }
   </style>
 </head>
 <body>
-  <h2 style="text-align:center">Kachroo Family Tree (Gen 1 to Gen 5)</h2>
-<div class="scroll-wrapper">
-  <div id="tree-simple"></div>
-</div>
 
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-left">
+      <div class="header-icon">
+        <i class="fas fa-sitemap"></i>
+      </div>
+      <div>
+        <div class="header-title">Kachroo Family Tree</div>
+        <div class="header-subtitle">Generations 1 through 5</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="search-container" id="searchContainer">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          id="searchInput"
+          placeholder="Search members..."
+          autocomplete="off"
+        />
+        <button class="search-clear" id="searchClear" aria-label="Clear search">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>
+      <div class="stats-bar" id="statsBar">
+        <div class="stat-pill" id="statMembers">
+          <i class="fas fa-users"></i>
+          <span>—</span>
+        </div>
+        <div class="stat-pill" id="statGenerations">
+          <i class="fas fa-layer-group"></i>
+          <span>—</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb-bar" id="breadcrumbBar"></div>
+
+  <!-- Loading State -->
+  <div class="loading-container" id="loadingState">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">Loading family tree...</div>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" id="errorState" style="display:none;">
+    <div class="error-icon"><i class="fas fa-circle-exclamation"></i></div>
+    <div class="error-message">Could not load family data. Please try again.</div>
+    <button class="error-retry" id="retryBtn">Retry</button>
+  </div>
+
+  <!-- Tree -->
+  <div class="scroll-wrapper" id="treeWrapper" style="display:none;">
+    <div id="tree-simple"></div>
+  </div>
+
+  <!-- No results toast -->
+  <div class="search-no-results" id="noResults">No matching members found</div>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/fperucic/treant-js/vendor/raphael.js"></script>
   <script src="https://cdn.jsdelivr.net/gh/fperucic/treant-js/Treant.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
   <script src="fetch-family-data.js"></script>
-  
 </body>
 </html>

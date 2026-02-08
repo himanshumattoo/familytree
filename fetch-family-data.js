@@ -199,6 +199,14 @@ function bindSearch() {
     debounceTimer = setTimeout(() => performSearch(query), 150);
   });
 
+  // Dismiss mobile keyboard on Enter/Search key
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      input.blur();
+    }
+  });
+
   clearBtn.addEventListener('click', () => {
     input.value = '';
     box.classList.remove('has-value');
@@ -269,6 +277,8 @@ function bindBreadcrumbs() {
         return `<span class="${cls}">${name}</span>${sep}`;
       }).join('');
       bar.classList.add('visible');
+      // Scroll breadcrumb to show the active (last) item
+      requestAnimationFrame(() => { bar.scrollLeft = bar.scrollWidth; });
     }
   });
 }

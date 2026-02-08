@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Kachroo Family Tree</title>
+  <meta name="theme-color" content="#FFFFFF" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
@@ -32,6 +35,7 @@
       color: #1A1A2E;
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
     }
 
     /* ── Header Bar ── */
@@ -42,8 +46,9 @@
       background: #FFFFFF;
       border-bottom: 1px solid #E2E8F0;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-      padding: 0 24px;
-      height: 64px;
+      padding: 0 max(24px, env(safe-area-inset-left)) 0 max(24px, env(safe-area-inset-right));
+      padding-top: env(safe-area-inset-top);
+      height: calc(64px + env(safe-area-inset-top));
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -134,7 +139,7 @@
 
     .search-clear {
       position: absolute;
-      right: 8px;
+      right: 2px;
       top: 50%;
       transform: translateY(-50%);
       background: none;
@@ -142,17 +147,23 @@
       color: #94A3B8;
       cursor: pointer;
       font-size: 12px;
-      padding: 4px;
-      display: none;
+      padding: 12px 10px;
       line-height: 1;
+      min-width: 44px;
+      min-height: 44px;
+      display: none;
+      align-items: center;
+      justify-content: center;
     }
 
-    .search-clear:hover {
-      color: #64748B;
+    @media (hover: hover) {
+      .search-clear:hover {
+        color: #64748B;
+      }
     }
 
     .search-container.has-value .search-clear {
-      display: block;
+      display: flex;
     }
 
     /* ── Stats Pills ── */
@@ -184,13 +195,22 @@
     .breadcrumb-bar {
       background: #FFFFFF;
       border-bottom: 1px solid #E2E8F0;
-      padding: 8px 24px;
+      padding: 8px max(24px, env(safe-area-inset-left));
+      padding-right: max(24px, env(safe-area-inset-right));
       font-size: 0.8125rem;
       color: #94A3B8;
       display: none;
       align-items: center;
       gap: 6px;
       min-height: 36px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+
+    .breadcrumb-bar::-webkit-scrollbar {
+      display: none;
     }
 
     .breadcrumb-bar.visible {
@@ -265,20 +285,28 @@
 
     .error-retry {
       margin-top: 4px;
-      padding: 8px 20px;
+      padding: 12px 28px;
       background: #3D5A80;
       color: #fff;
       border: none;
       border-radius: 8px;
       font-family: inherit;
-      font-size: 0.8125rem;
+      font-size: 0.875rem;
       font-weight: 500;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, transform 0.1s;
+      min-height: 44px;
     }
 
-    .error-retry:hover {
+    @media (hover: hover) {
+      .error-retry:hover {
+        background: #2C4A6E;
+      }
+    }
+
+    .error-retry:active {
       background: #2C4A6E;
+      transform: scale(0.97);
     }
 
     /* ── Tree Scroll Container ── */
@@ -286,9 +314,11 @@
       overflow-x: auto;
       overflow-y: auto;
       width: 100%;
-      height: calc(100vh - 64px);
+      height: calc(100vh - 64px - env(safe-area-inset-top));
       touch-action: pan-x pan-y pinch-zoom;
-      padding: 32px 24px 48px;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+      padding: 32px max(24px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
     }
 
     #tree-simple {
@@ -320,10 +350,18 @@
       max-width: 220px;
     }
 
-    .Treant .node:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
-      transform: translateY(-1px);
-      border-left-color: #2C4A6E;
+    @media (hover: hover) {
+      .Treant .node:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+        transform: translateY(-1px);
+        border-left-color: #2C4A6E;
+      }
+    }
+
+    .Treant .node:active {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      transform: scale(0.98);
+      background-color: #F8F9FA;
     }
 
     .Treant .node.search-match {
@@ -383,24 +421,40 @@
       justify-content: center;
       font-size: 10px;
       cursor: pointer;
-      opacity: 0.5;
+      opacity: 0.7;
       transition: opacity 0.2s, transform 0.2s, background-color 0.2s;
       transform: scale(1.2);
+      /* Enlarge tap area without changing visual size */
+      position: relative;
     }
 
-    .Treant .collapse-switch:hover {
-      transform: scale(1.4);
-      background-color: #E2E8F0;
+    .Treant .collapse-switch::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+    }
+
+    @media (hover: hover) {
+      .Treant .collapse-switch:hover {
+        transform: scale(1.4);
+        background-color: #E2E8F0;
+        opacity: 1;
+      }
+
+      .Treant .node:hover > .collapse-switch {
+        opacity: 1;
+      }
+    }
+
+    .Treant .collapse-switch:active {
+      transform: scale(1.0);
+      background-color: #CBD5E1;
       opacity: 1;
-    }
-
-    .Treant .node:hover > .collapse-switch {
-      opacity: 1;
-    }
-
-    .Treant .collapse-switch::before,
-    .Treant .collapse-switch::after {
-      content: none;
     }
 
     .Treant .collapse-switch::after {
@@ -421,7 +475,7 @@
     .search-no-results {
       display: none;
       position: fixed;
-      bottom: 24px;
+      bottom: max(24px, env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
       background: #1A1A2E;
@@ -438,12 +492,14 @@
       display: block;
     }
 
-    /* ── Responsive ── */
+    /* ── Responsive: Tablet (768px) ── */
     @media (max-width: 768px) {
       .site-header {
         padding: 0 16px;
-        height: 56px;
+        padding-top: env(safe-area-inset-top);
+        height: calc(56px + env(safe-area-inset-top));
         gap: 12px;
+        flex-wrap: wrap;
       }
 
       .header-title {
@@ -455,11 +511,22 @@
       }
 
       .search-container {
-        width: 160px;
+        width: 180px;
       }
 
+      /* Move stats below header as a compact inline bar */
       .stats-bar {
-        display: none;
+        display: flex;
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        padding-bottom: 8px;
+        gap: 12px;
+      }
+
+      .stat-pill {
+        font-size: 0.6875rem;
+        padding: 3px 10px;
       }
 
       .breadcrumb-bar {
@@ -468,8 +535,8 @@
       }
 
       .scroll-wrapper {
-        height: calc(100vh - 56px);
-        padding: 20px 12px 40px;
+        height: calc(100vh - 86px - env(safe-area-inset-top));
+        padding: 20px max(12px, env(safe-area-inset-left)) max(40px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
       }
 
       #tree-simple {
@@ -478,20 +545,31 @@
       }
 
       .Treant .node {
-        font-size: 0.75rem;
+        font-size: 0.8125rem;
         padding: 10px 12px;
-        min-width: 110px;
-        max-width: 180px;
+        min-width: 120px;
+        max-width: 200px;
       }
 
       .family-card .card-name {
         font-size: 0.8125rem;
       }
+
+      /* Make collapse switch more visible on touch */
+      .Treant .collapse-switch {
+        opacity: 0.85;
+        transform: scale(1.3);
+      }
     }
 
+    /* ── Responsive: Phone (480px) ── */
     @media (max-width: 480px) {
-      .search-container {
-        width: 120px;
+      .site-header {
+        gap: 8px;
+      }
+
+      .header-left {
+        gap: 8px;
       }
 
       .header-icon {
@@ -500,6 +578,90 @@
         font-size: 14px;
         border-radius: 6px;
       }
+
+      .header-title {
+        font-size: 0.875rem;
+      }
+
+      /* Full-width search on small phones */
+      .header-right {
+        gap: 8px;
+      }
+
+      .search-container {
+        width: 140px;
+        flex: 1;
+        min-width: 0;
+      }
+
+      .search-input {
+        font-size: 16px; /* Prevents iOS auto-zoom on focus */
+        padding: 10px 36px 10px 34px;
+      }
+
+      .stats-bar {
+        gap: 8px;
+        padding-bottom: 6px;
+      }
+
+      .stat-pill {
+        font-size: 0.625rem;
+        padding: 2px 8px;
+      }
+
+      .scroll-wrapper {
+        height: calc(100vh - 94px - env(safe-area-inset-top));
+        padding: 16px max(8px, env(safe-area-inset-left)) max(32px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
+      }
+
+      .Treant .node {
+        font-size: 0.8125rem;
+        padding: 10px 12px;
+        min-width: 110px;
+        max-width: 190px;
+      }
+
+      .search-no-results {
+        left: 16px;
+        right: 16px;
+        transform: none;
+        text-align: center;
+      }
+    }
+
+    /* ── Responsive: Landscape phones ── */
+    @media (max-height: 480px) and (orientation: landscape) {
+      .site-header {
+        height: calc(44px + env(safe-area-inset-top));
+        flex-wrap: nowrap;
+      }
+
+      .stats-bar {
+        order: unset;
+        width: auto;
+        padding-bottom: 0;
+      }
+
+      .scroll-wrapper {
+        height: calc(100vh - 44px - env(safe-area-inset-top));
+        padding: 12px max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      }
+    }
+
+    /* ── Focus-visible for accessibility ── */
+    .search-input:focus-visible {
+      outline: 2px solid #3D5A80;
+      outline-offset: 2px;
+    }
+
+    .error-retry:focus-visible {
+      outline: 2px solid #3D5A80;
+      outline-offset: 2px;
+    }
+
+    .search-clear:focus-visible {
+      outline: 2px solid #3D5A80;
+      outline-offset: 2px;
     }
   </style>
 </head>
@@ -520,11 +682,12 @@
       <div class="search-container" id="searchContainer">
         <i class="fas fa-search search-icon"></i>
         <input
-          type="text"
+          type="search"
           class="search-input"
           id="searchInput"
           placeholder="Search members..."
           autocomplete="off"
+          enterkeyhint="search"
         />
         <button class="search-clear" id="searchClear" aria-label="Clear search">
           <i class="fas fa-xmark"></i>

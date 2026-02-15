@@ -1,0 +1,18 @@
+{
+  "name": "Kachroo Family Tree",
+  "short_name": "Family Tree",
+  "description": "Interactive family tree viewer for the Kachroo family",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F9FA",
+  "theme_color": "#3D5A80",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%233D5A80'/><text x='50' y='68' text-anchor='middle' font-size='50' font-family='sans-serif' fill='white'>K</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

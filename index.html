@@ -6,20 +6,22 @@
   <title>Kachroo Family Tree</title>
   <meta name="theme-color" content="#FFFFFF" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.json" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
 
-  <!-- Google Fonts: Inter -->
+  <!-- Preconnect for faster loads -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://docs.google.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <!-- Treant.js and dependencies -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fperucic/treant-js/Treant.css">
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Icons: inline SVGs replace Font Awesome -->
 
   <style>
     /* ── Reset & Base ── */
@@ -29,10 +31,59 @@
       padding: 0;
     }
 
+    :root {
+      --bg: #F8F9FA;
+      --bg-card: #FFFFFF;
+      --bg-hover: #F1F5F9;
+      --bg-input: #F8F9FA;
+      --bg-pill: #F1F5F9;
+      --text: #1A1A2E;
+      --text-secondary: #475569;
+      --text-muted: #64748B;
+      --text-faint: #94A3B8;
+      --border: #E2E8F0;
+      --border-light: #CBD5E1;
+      --primary: #3D5A80;
+      --primary-dark: #2C4A6E;
+      --accent: #2EC4B6;
+      --danger: #E53E3E;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+      --shadow-header: 0 1px 3px rgba(0, 0, 0, 0.06);
+      --shadow-zoom: 0 2px 12px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
+      --toast-bg: #1A1A2E;
+      --toast-text: #fff;
+      color-scheme: light dark;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0F172A;
+      --bg-card: #1E293B;
+      --bg-hover: #334155;
+      --bg-input: #1E293B;
+      --bg-pill: #334155;
+      --text: #E2E8F0;
+      --text-secondary: #CBD5E1;
+      --text-muted: #94A3B8;
+      --text-faint: #64748B;
+      --border: #334155;
+      --border-light: #475569;
+      --primary: #5B8FB9;
+      --primary-dark: #7BAFD4;
+      --accent: #2EC4B6;
+      --danger: #FC8181;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.15);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 4px rgba(0, 0, 0, 0.2);
+      --shadow-header: 0 1px 3px rgba(0, 0, 0, 0.2);
+      --shadow-zoom: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+      --toast-bg: #E2E8F0;
+      --toast-text: #0F172A;
+    }
+
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background-color: #F8F9FA;
-      color: #1A1A2E;
+      background-color: var(--bg);
+      color: var(--text);
       line-height: 1.5;
       -webkit-font-smoothing: antialiased;
       overscroll-behavior: none;
@@ -43,9 +94,9 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: #FFFFFF;
-      border-bottom: 1px solid #E2E8F0;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-header);
       padding: 0 max(24px, env(safe-area-inset-left)) 0 max(24px, env(safe-area-inset-right));
       padding-top: env(safe-area-inset-top);
       height: calc(64px + env(safe-area-inset-top));
@@ -65,7 +116,7 @@
     .header-icon {
       width: 36px;
       height: 36px;
-      background: #3D5A80;
+      background: var(--primary);
       border-radius: 8px;
       display: flex;
       align-items: center;
@@ -78,7 +129,7 @@
     .header-title {
       font-size: 1.125rem;
       font-weight: 700;
-      color: #1A1A2E;
+      color: var(--text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -86,7 +137,7 @@
 
     .header-subtitle {
       font-size: 0.75rem;
-      color: #6C757D;
+      color: var(--text-muted);
       font-weight: 500;
       white-space: nowrap;
     }
@@ -109,31 +160,30 @@
       left: 10px;
       top: 50%;
       transform: translateY(-50%);
-      color: #94A3B8;
-      font-size: 13px;
+      color: var(--text-faint);
       pointer-events: none;
     }
 
     .search-input {
       width: 100%;
       padding: 8px 32px 8px 34px;
-      border: 1px solid #E2E8F0;
+      border: 1px solid var(--border);
       border-radius: 8px;
       font-family: inherit;
       font-size: 0.8125rem;
-      color: #1A1A2E;
-      background: #F8F9FA;
+      color: var(--text);
+      background: var(--bg-input);
       outline: none;
       transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s;
     }
 
     .search-input::placeholder {
-      color: #94A3B8;
+      color: var(--text-faint);
     }
 
     .search-input:focus {
-      border-color: #3D5A80;
-      background: #fff;
+      border-color: var(--primary);
+      background: var(--bg-card);
       box-shadow: 0 0 0 3px rgba(61, 90, 128, 0.1);
     }
 
@@ -144,7 +194,7 @@
       transform: translateY(-50%);
       background: none;
       border: none;
-      color: #94A3B8;
+      color: var(--text-faint);
       cursor: pointer;
       font-size: 12px;
       padding: 12px 10px;
@@ -158,7 +208,7 @@
 
     @media (hover: hover) {
       .search-clear:hover {
-        color: #64748B;
+        color: var(--text-muted);
       }
     }
 
@@ -178,27 +228,26 @@
       align-items: center;
       gap: 6px;
       padding: 5px 12px;
-      background: #F1F5F9;
+      background: var(--bg-pill);
       border-radius: 20px;
       font-size: 0.75rem;
       font-weight: 500;
-      color: #475569;
+      color: var(--text-secondary);
       white-space: nowrap;
     }
 
-    .stat-pill i {
-      font-size: 11px;
-      color: #3D5A80;
+    .stat-pill svg {
+      flex-shrink: 0;
     }
 
     /* ── Breadcrumb ── */
     .breadcrumb-bar {
-      background: #FFFFFF;
-      border-bottom: 1px solid #E2E8F0;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
       padding: 8px max(24px, env(safe-area-inset-left));
       padding-right: max(24px, env(safe-area-inset-right));
       font-size: 0.8125rem;
-      color: #94A3B8;
+      color: var(--text-faint);
       display: none;
       align-items: center;
       gap: 6px;
@@ -217,21 +266,21 @@
       display: flex;
     }
 
-    .breadcrumb-bar i {
-      font-size: 10px;
+    .breadcrumb-bar svg {
+      vertical-align: middle;
     }
 
     .breadcrumb-item {
-      color: #64748B;
+      color: var(--text-muted);
     }
 
     .breadcrumb-item.active {
-      color: #3D5A80;
+      color: var(--primary);
       font-weight: 600;
     }
 
     .breadcrumb-sep {
-      color: #CBD5E1;
+      color: var(--border-light);
     }
 
     /* ── Loading State ── */
@@ -241,14 +290,15 @@
       align-items: center;
       justify-content: center;
       height: calc(100vh - 64px);
+      height: calc(100dvh - 64px);
       gap: 16px;
     }
 
     .loading-spinner {
       width: 40px;
       height: 40px;
-      border: 3px solid #E2E8F0;
-      border-top-color: #3D5A80;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
     }
@@ -259,7 +309,7 @@
 
     .loading-text {
       font-size: 0.875rem;
-      color: #94A3B8;
+      color: var(--text-faint);
       font-weight: 500;
     }
 
@@ -270,23 +320,23 @@
       align-items: center;
       justify-content: center;
       height: calc(100vh - 64px);
+      height: calc(100dvh - 64px);
       gap: 12px;
     }
 
     .error-icon {
-      font-size: 2rem;
-      color: #E53E3E;
+      color: var(--danger);
     }
 
     .error-message {
       font-size: 0.875rem;
-      color: #64748B;
+      color: var(--text-muted);
     }
 
     .error-retry {
       margin-top: 4px;
       padding: 12px 28px;
-      background: #3D5A80;
+      background: var(--primary);
       color: #fff;
       border: none;
       border-radius: 8px;
@@ -300,12 +350,12 @@
 
     @media (hover: hover) {
       .error-retry:hover {
-        background: #2C4A6E;
+        background: var(--primary-dark);
       }
     }
 
     .error-retry:active {
-      background: #2C4A6E;
+      background: var(--primary-dark);
       transform: scale(0.97);
     }
 
@@ -315,10 +365,21 @@
       overflow-y: auto;
       width: 100%;
       height: calc(100vh - 64px - env(safe-area-inset-top));
+      height: calc(100dvh - 64px - env(safe-area-inset-top));
       touch-action: pan-x pan-y pinch-zoom;
       -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
       padding: 32px max(24px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+    }
+
+    @media (hover: hover) {
+      .scroll-wrapper {
+        cursor: grab;
+      }
+      .scroll-wrapper.is-dragging {
+        cursor: grabbing;
+        user-select: none;
+      }
     }
 
     #tree-simple {
@@ -326,11 +387,13 @@
       max-width: 2400px;
       height: 100%;
       display: inline-block;
+      transform-origin: 0 0;
+      transition: transform 0.15s ease-out;
     }
 
     /* ── Treant Connector Lines ── */
     .Treant > .node-connector {
-      border-color: #CBD5E1 !important;
+      border-color: var(--border-light) !important;
     }
 
     /* ── Tree Nodes ── */
@@ -340,11 +403,11 @@
       font-size: 0.8125rem;
       padding: 12px 16px;
       cursor: pointer;
-      background-color: #FFFFFF;
+      background-color: var(--bg-card);
       border-radius: 10px;
-      border: 1px solid #E2E8F0;
-      border-left: 3px solid #3D5A80;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--primary);
+      box-shadow: var(--shadow-sm);
       transition: box-shadow 0.2s, transform 0.15s, border-color 0.2s;
       min-width: 140px;
       max-width: 220px;
@@ -352,21 +415,27 @@
 
     @media (hover: hover) {
       .Treant .node:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+        box-shadow: var(--shadow-md);
         transform: translateY(-1px);
-        border-left-color: #2C4A6E;
+        border-left-color: var(--primary-dark);
       }
     }
 
     .Treant .node:active {
       box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       transform: scale(0.98);
-      background-color: #F8F9FA;
+      background-color: var(--bg);
     }
 
     .Treant .node.search-match {
-      border-left-color: #2EC4B6;
+      border-left-color: var(--accent);
       box-shadow: 0 0 0 2px rgba(46, 196, 182, 0.25), 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .Treant .node.search-active {
+      border-left-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(61, 90, 128, 0.35), 0 4px 16px rgba(0, 0, 0, 0.12);
+      transform: scale(1.03);
     }
 
     .Treant .node.search-dimmed {
@@ -389,19 +458,19 @@
     .family-card .card-name {
       font-weight: 600;
       font-size: 0.875rem;
-      color: #1A1A2E;
+      color: var(--text);
       margin-bottom: 2px;
     }
 
     .family-card .card-detail {
       font-size: 0.75rem;
-      color: #64748B;
+      color: var(--text-muted);
       line-height: 1.4;
     }
 
     .family-card .card-detail strong {
       font-weight: 500;
-      color: #475569;
+      color: var(--text-secondary);
     }
 
     .family-card div + div {
@@ -414,8 +483,8 @@
       height: 22px;
       line-height: 22px;
       border-radius: 50%;
-      background: #F1F5F9;
-      border: 1px solid #CBD5E1;
+      background: var(--bg-pill);
+      border: 1px solid var(--border-light);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -442,7 +511,7 @@
     @media (hover: hover) {
       .Treant .collapse-switch:hover {
         transform: scale(1.4);
-        background-color: #E2E8F0;
+        background-color: var(--border);
         opacity: 1;
       }
 
@@ -453,22 +522,20 @@
 
     .Treant .collapse-switch:active {
       transform: scale(1.0);
-      background-color: #CBD5E1;
+      background-color: var(--border-light);
       opacity: 1;
     }
 
     .Treant .collapse-switch::after {
-      content: "\f068";
-      font-family: "Font Awesome 6 Free";
-      font-weight: 900;
-      font-size: 9px;
-      color: #64748B;
+      content: "\2212";
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1;
     }
 
     .Treant .node.collapsed > .collapse-switch::after {
-      content: "\f067";
-      font-family: "Font Awesome 6 Free";
-      font-weight: 900;
+      content: "\002B";
     }
 
     /* ── No Results Message ── */
@@ -478,8 +545,8 @@
       bottom: max(24px, env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
-      background: #1A1A2E;
-      color: #fff;
+      background: var(--toast-bg);
+      color: var(--toast-text);
       padding: 10px 20px;
       border-radius: 8px;
       font-size: 0.8125rem;
@@ -536,6 +603,7 @@
 
       .scroll-wrapper {
         height: calc(100vh - 86px - env(safe-area-inset-top));
+        height: calc(100dvh - 86px - env(safe-area-inset-top));
         padding: 20px max(12px, env(safe-area-inset-left)) max(40px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
       }
 
@@ -611,6 +679,7 @@
 
       .scroll-wrapper {
         height: calc(100vh - 94px - env(safe-area-inset-top));
+        height: calc(100dvh - 94px - env(safe-area-inset-top));
         padding: 16px max(8px, env(safe-area-inset-left)) max(32px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
       }
 
@@ -644,24 +713,369 @@
 
       .scroll-wrapper {
         height: calc(100vh - 44px - env(safe-area-inset-top));
+        height: calc(100dvh - 44px - env(safe-area-inset-top));
         padding: 12px max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+      }
+    }
+
+    /* ── Search Navigation ── */
+    .search-nav {
+      display: none;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .search-nav.visible {
+      display: flex;
+    }
+
+    .search-counter {
+      font-size: 0.6875rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+      padding: 0 6px;
+      min-width: 48px;
+      text-align: center;
+    }
+
+    .search-nav-btn {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: background-color 0.15s;
+      min-width: 32px;
+      min-height: 32px;
+    }
+
+    .search-nav-btn svg {
+      width: 12px;
+      height: 12px;
+      fill: currentColor;
+    }
+
+    @media (hover: hover) {
+      .search-nav-btn:hover {
+        background: var(--border);
+      }
+    }
+
+    .search-nav-btn:active {
+      background: var(--border-light);
+    }
+
+    .search-nav-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    @media (max-width: 480px) {
+      .search-counter {
+        font-size: 0.625rem;
+        padding: 0 4px;
+        min-width: 36px;
+      }
+      .search-nav-btn {
+        width: 28px;
+        height: 28px;
+        min-width: 28px;
+        min-height: 28px;
+      }
+    }
+
+    /* ── Expand/Collapse All Button ── */
+    .expand-toggle {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      background: var(--bg-pill);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background-color 0.15s, border-color 0.15s;
+      min-height: 36px;
+    }
+
+    .expand-toggle svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    @media (hover: hover) {
+      .expand-toggle:hover {
+        background: var(--border);
+        border-color: var(--border-light);
+      }
+    }
+
+    .expand-toggle:active {
+      background: var(--border-light);
+    }
+
+    @media (max-width: 768px) {
+      .expand-toggle span {
+        display: none;
+      }
+      .expand-toggle {
+        padding: 6px 10px;
+        min-height: 36px;
+        min-width: 36px;
+        justify-content: center;
+      }
+    }
+
+    /* ── Zoom Controls ── */
+    .zoom-controls {
+      position: fixed;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      right: max(20px, env(safe-area-inset-right));
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      z-index: 150;
+      background: var(--bg-card);
+      border-radius: 12px;
+      box-shadow: var(--shadow-zoom);
+      padding: 4px;
+    }
+
+    .zoom-btn {
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: background-color 0.15s, color 0.15s;
+      position: relative;
+    }
+
+    .zoom-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    @media (hover: hover) {
+      .zoom-btn:hover {
+        background: var(--bg-hover);
+        color: var(--text);
+      }
+    }
+
+    .zoom-btn:active {
+      background: var(--border);
+    }
+
+    .zoom-btn:disabled {
+      opacity: 0.3;
+      cursor: default;
+    }
+
+    .zoom-level {
+      text-align: center;
+      font-size: 0.6875rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 2px 0;
+      user-select: none;
+      min-width: 40px;
+    }
+
+    .zoom-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 0 6px;
+    }
+
+    /* Hide zoom controls when tree not visible */
+    .zoom-controls[hidden] {
+      display: none;
+    }
+
+    @media (max-width: 480px) {
+      .zoom-controls {
+        bottom: max(12px, env(safe-area-inset-bottom));
+        right: max(12px, env(safe-area-inset-right));
+        padding: 3px;
+        gap: 2px;
+      }
+      .zoom-btn {
+        width: 36px;
+        height: 36px;
+      }
+      .zoom-level {
+        font-size: 0.625rem;
+      }
+    }
+
+    /* ── Minimap ── */
+    .minimap {
+      position: fixed;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      left: max(20px, env(safe-area-inset-left));
+      width: 160px;
+      height: 100px;
+      background: var(--bg-card);
+      border-radius: 10px;
+      box-shadow: var(--shadow-zoom);
+      z-index: 150;
+      overflow: hidden;
+      cursor: pointer;
+      display: none;
+    }
+
+    .minimap.visible {
+      display: block;
+    }
+
+    .minimap-content {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform-origin: 0 0;
+    }
+
+    .minimap-viewport {
+      position: absolute;
+      border: 2px solid var(--primary);
+      background: rgba(61, 90, 128, 0.1);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+
+    @media (max-width: 768px) {
+      .minimap {
+        display: none !important;
+      }
+    }
+
+    @media print {
+      .minimap { display: none !important; }
+    }
+
+    /* ── Theme Toggle ── */
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--border);
+      background: var(--bg-pill);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      transition: background-color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .theme-toggle svg {
+      width: 16px;
+      height: 16px;
+      fill: currentColor;
+    }
+
+    @media (hover: hover) {
+      .theme-toggle:hover {
+        background: var(--border);
+      }
+    }
+
+    /* Show sun in dark mode, moon in light mode */
+    .theme-toggle .icon-moon { display: block; }
+    .theme-toggle .icon-sun { display: none; }
+    [data-theme="dark"] .theme-toggle .icon-moon { display: none; }
+    [data-theme="dark"] .theme-toggle .icon-sun { display: block; }
+
+    @media (max-width: 480px) {
+      .theme-toggle {
+        width: 32px;
+        height: 32px;
       }
     }
 
     /* ── Focus-visible for accessibility ── */
     .search-input:focus-visible {
-      outline: 2px solid #3D5A80;
+      outline: 2px solid var(--primary);
       outline-offset: 2px;
     }
 
     .error-retry:focus-visible {
-      outline: 2px solid #3D5A80;
+      outline: 2px solid var(--primary);
       outline-offset: 2px;
     }
 
     .search-clear:focus-visible {
-      outline: 2px solid #3D5A80;
+      outline: 2px solid var(--primary);
       outline-offset: 2px;
+    }
+    /* ── Print Stylesheet ── */
+    @media print {
+      .site-header,
+      .breadcrumb-bar,
+      .zoom-controls,
+      .search-no-results,
+      #loadingState,
+      #errorState {
+        display: none !important;
+      }
+
+      body {
+        background: #fff !important;
+        color: #000 !important;
+      }
+
+      .scroll-wrapper {
+        height: auto !important;
+        overflow: visible !important;
+        padding: 0 !important;
+      }
+
+      #tree-simple {
+        transform: none !important;
+        max-width: none !important;
+      }
+
+      .Treant .node {
+        box-shadow: none !important;
+        border: 1px solid #999 !important;
+        break-inside: avoid;
+        background: #fff !important;
+      }
+
+      .Treant .node.collapsed {
+        display: block !important;
+      }
+
+      .Treant .node.search-dimmed {
+        opacity: 1 !important;
+      }
+
+      .Treant > .node-connector {
+        border-color: #999 !important;
+      }
     }
   </style>
 </head>
@@ -671,7 +1085,7 @@
   <header class="site-header">
     <div class="header-left">
       <div class="header-icon">
-        <i class="fas fa-sitemap"></i>
+        <svg width="16" height="16" viewBox="0 0 640 512" fill="currentColor"><path d="M128 352H192V480c0 17.7-14.3 32-32 32H128c-17.7 0-32-14.3-32-32V352h32zm256 0h64V480c0 17.7-14.3 32-32 32H320c-17.7 0-32-14.3-32-32V352h96zm192 0h32V480c0 17.7-14.3 32-32 32H544c-17.7 0-32-14.3-32-32V352h64zM544 128H352V32c0-17.7 14.3-32 32-32h128c17.7 0 32 14.3 32 32v96zm-64 64v96H352V192h128zM320 288H192V192h128v96zm-64 64H96V256H64V128H288v64H192V288H256v64z"/></svg>
       </div>
       <div>
         <div class="header-title">Kachroo Family Tree</div>
@@ -680,7 +1094,7 @@
     </div>
     <div class="header-right">
       <div class="search-container" id="searchContainer">
-        <i class="fas fa-search search-icon"></i>
+        <svg class="search-icon" width="13" height="13" viewBox="0 0 512 512" fill="currentColor"><path d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/></svg>
         <input
           type="search"
           class="search-input"
@@ -690,16 +1104,33 @@
           enterkeyhint="search"
         />
         <button class="search-clear" id="searchClear" aria-label="Clear search">
-          <i class="fas fa-xmark"></i>
+          <svg width="12" height="12" viewBox="0 0 384 512" fill="currentColor"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
         </button>
       </div>
+      <div class="search-nav" id="searchNav">
+        <button class="search-nav-btn" id="searchPrev" title="Previous match">
+          <svg viewBox="0 0 384 512"><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 109.3 329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>
+        </button>
+        <span class="search-counter" id="searchCounter">0 / 0</span>
+        <button class="search-nav-btn" id="searchNext" title="Next match">
+          <svg viewBox="0 0 384 512"><path d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 402.7 54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+        </button>
+      </div>
+      <button class="expand-toggle" id="expandToggle" title="Expand all nodes" hidden>
+        <svg viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32v144H48c-17.7 0-32 14.3-32 32s14.3 32 32 32h144v144c0 17.7 14.3 32 32 32s32-14.3 32-32V288h144c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+        <span>Expand All</span>
+      </button>
+      <button class="theme-toggle" id="themeToggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+        <svg class="icon-moon" viewBox="0 0 384 512"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
+        <svg class="icon-sun" viewBox="0 0 512 512"><path d="M361.5 1.2c5 2.1 8.6 6.6 9.6 11.9L391 121l107.9 19.8c5.3 1 9.8 4.6 11.9 9.6s1.5 10.7-1.6 15.2L446.9 256l62.3 90.3c3.1 4.5 3.7 10.2 1.6 15.2s-6.6 8.6-11.9 9.6L391 390.9l-19.9 107.9c-1 5.3-4.6 9.8-9.6 11.9s-10.7 1.5-15.2-1.6L256 446.9l-90.3 62.3c-4.5 3.1-10.2 3.7-15.2 1.6s-8.6-6.6-9.6-11.9L121 391 13.1 371.1c-5.3-1-9.8-4.6-11.9-9.6s-1.5-10.7 1.6-15.2L65.1 256 2.8 165.7c-3.1-4.5-3.7-10.2-1.6-15.2s6.6-8.6 11.9-9.6L121 121 140.9 13.1c1-5.3 4.6-9.8 9.6-11.9s10.7-1.5 15.2 1.6L256 65.1 346.3 2.8c4.5-3.1 10.2-3.7 15.2-1.6zM256 160a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"/></svg>
+      </button>
       <div class="stats-bar" id="statsBar">
         <div class="stat-pill" id="statMembers">
-          <i class="fas fa-users"></i>
+          <svg width="11" height="11" viewBox="0 0 640 512" fill="currentColor" style="color:var(--primary)"><path d="M144 0a80 80 0 1 1 0 160A80 80 0 1 1 144 0zM512 0a80 80 0 1 1 0 160A80 80 0 1 1 512 0zM0 298.7C0 239.8 47.8 192 106.7 192h42.7c15.9 0 31 3.5 44.6 9.7c-1.3 7.2-1.9 14.7-1.9 22.3c0 38.2 16.8 72.5 43.3 96H21.3C9.6 320 0 310.4 0 298.7zM405.3 320h-.8c26.6-23.5 43.3-57.8 43.3-96c0-7.6-.7-15-1.9-22.3c13.6-6.3 28.7-9.7 44.6-9.7h42.7C592.2 192 640 239.8 640 298.7c0 11.8-9.6 21.3-21.3 21.3H405.3zM224 224a96 96 0 1 1 192 0 96 96 0 1 1 -192 0zM128 485.3C128 411.7 187.7 352 261.3 352H378.7C452.3 352 512 411.7 512 485.3c0 14.7-11.9 26.7-26.7 26.7H154.7c-14.7 0-26.7-11.9-26.7-26.7z"/></svg>
           <span>—</span>
         </div>
         <div class="stat-pill" id="statGenerations">
-          <i class="fas fa-layer-group"></i>
+          <svg width="11" height="11" viewBox="0 0 576 512" fill="currentColor" style="color:var(--primary)"><path d="M264.5 5.2c14.9-6.9 32.1-6.9 47 0l218.6 101c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 149.8C37.4 145.8 32 137.3 32 128s5.4-17.9 13.9-21.8L264.5 5.2zM476.9 209.6l53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 277.8C37.4 273.8 32 265.3 32 256s5.4-17.9 13.9-21.8l53.2-24.6 152.4 70.6c23.7 10.8 50.4 10.8 73.6 0l152.4-70.6zm-152.4 198.6c23.7 10.8 50.4 10.8 73.6 0l152.4-70.6 53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 405.8C37.4 401.8 32 393.3 32 384s5.4-17.9 13.9-21.8l53.2-24.6 152.4 70.6z"/></svg>
           <span>—</span>
         </div>
       </div>
@@ -717,7 +1148,7 @@
 
   <!-- Error State -->
   <div class="error-container" id="errorState" style="display:none;">
-    <div class="error-icon"><i class="fas fa-circle-exclamation"></i></div>
+    <div class="error-icon"><svg width="32" height="32" viewBox="0 0 512 512" fill="currentColor"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24V264c0 13.3-10.7 24-24 24s-24-10.7-24-24V152c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg></div>
     <div class="error-message">Could not load family data. Please try again.</div>
     <button class="error-retry" id="retryBtn">Retry</button>
   </div>
@@ -727,13 +1158,37 @@
     <div id="tree-simple"></div>
   </div>
 
+  <!-- Minimap -->
+  <div class="minimap" id="minimap">
+    <div class="minimap-content" id="minimapContent"></div>
+    <div class="minimap-viewport" id="minimapViewport"></div>
+  </div>
+
+  <!-- Zoom Controls -->
+  <div class="zoom-controls" id="zoomControls" hidden>
+    <button class="zoom-btn" id="zoomIn" title="Zoom in">
+      <svg viewBox="0 0 448 512"><path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32v144H48c-17.7 0-32 14.3-32 32s14.3 32 32 32h144v144c0 17.7 14.3 32 32 32s32-14.3 32-32V288h144c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z"/></svg>
+    </button>
+    <div class="zoom-level" id="zoomLevel">100%</div>
+    <button class="zoom-btn" id="zoomOut" title="Zoom out">
+      <svg viewBox="0 0 448 512"><path d="M432 256c0 17.7-14.3 32-32 32H48c-17.7 0-32-14.3-32-32s14.3-32 32-32h352c17.7 0 32 14.3 32 32z"/></svg>
+    </button>
+    <div class="zoom-divider"></div>
+    <button class="zoom-btn" id="zoomFit" title="Fit to screen">
+      <svg viewBox="0 0 512 512"><path d="M200 32H56C42.7 32 32 42.7 32 56v144c0 9.7 5.8 18.5 14.8 22.2s19.3 1.7 26.2-5.2l40-40 79 79c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-79-79 40-40c6.9-6.9 8.9-17.2 5.2-26.2S209.7 32 200 32zm0 448c9.7 0 18.5-5.8 22.2-14.8s1.7-19.3-5.2-26.2l-40-40 79-79c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-79 79-40-40c-6.9-6.9-17.2-8.9-26.2-5.2S32 318.3 32 328v144c0 13.3 10.7 24 24 24h144zm312-24V312c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2l-40 40-79-79c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l79 79-40 40c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8h144c13.3 0 24-10.7 24-24zM312 32c-9.7 0-18.5 5.8-22.2 14.8s-1.7 19.3 5.2 26.2l40 40-79 79c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l79-79 40 40c6.9 6.9 17.2 8.9 26.2 5.2S480 193.7 480 184V56c0-13.3-10.7-24-24-24H312z"/></svg>
+    </button>
+    <button class="zoom-btn" id="zoomReset" title="Reset zoom">
+      <svg viewBox="0 0 512 512"><path d="M48.5 224H40c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2L98.6 96.6c87.6-86.5 228.7-86.2 315.8 1c87.5 87.5 87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3c-62.2-62.2-162.7-62.5-225.3-1L185 183c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8H48.5z"/></svg>
+    </button>
+  </div>
+
   <!-- No results toast -->
   <div class="search-no-results" id="noResults">No matching members found</div>
 
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/fperucic/treant-js/vendor/raphael.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/fperucic/treant-js/Treant.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
-  <script src="fetch-family-data.js"></script>
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/fperucic/treant-js/vendor/raphael.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/gh/fperucic/treant-js/Treant.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/papaparse@5.3.2/papaparse.min.js"></script>
+  <script defer src="fetch-family-data.js"></script>
 </body>
 </html>

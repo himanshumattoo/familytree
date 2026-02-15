@@ -657,6 +657,45 @@ function bindKeyboardShortcuts() {
   });
 }
 
+// ── Password gate ──
+// SHA-256 hash of the password "familytree"
+const PASSWORD_HASH = '6ff6a9b4a8947fad0af9cd456fe06ced2697ed3d56841e1c8e2013ed11f633a5';
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function initPasswordGate() {
+  const gate = document.getElementById('passwordGate');
+  const form = document.getElementById('gateForm');
+  const input = document.getElementById('gateInput');
+  const error = document.getElementById('gateError');
+
+  // Check if already authenticated this session
+  if (sessionStorage.getItem('authenticated') === '1') {
+    gate.hidden = true;
+    return true;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const hash = await sha256(input.value);
+    if (hash === PASSWORD_HASH) {
+      sessionStorage.setItem('authenticated', '1');
+      gate.hidden = true;
+      loadFamilyTree();
+    } else {
+      error.textContent = 'Incorrect password';
+      input.value = '';
+      input.focus();
+    }
+  });
+
+  return false;
+}
+
 // ── Dark mode ──
 function initTheme() {
   const saved = localStorage.getItem('theme');
@@ -690,7 +729,10 @@ if ('serviceWorker' in navigator) {
 // ── Boot ──
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  loadFamilyTree();
+  const authenticated = initPasswordGate();
+  if (authenticated) {
+    loadFamilyTree();
+  }
   ui.retry().addEventListener('click', loadFamilyTree);
   bindKeyboardShortcuts();
 });

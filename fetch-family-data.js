@@ -687,9 +687,13 @@ function initPasswordGate() {
       gate.hidden = true;
       loadFamilyTree();
     } else {
-      error.textContent = 'Incorrect password';
+      error.textContent = 'Incorrect password. Please try again.';
       input.value = '';
       input.focus();
+      form.classList.remove('shake');
+      void form.offsetWidth; // reflow to restart animation
+      form.classList.add('shake');
+      setTimeout(() => form.classList.remove('shake'), 600);
     }
   });
 
@@ -718,7 +722,7 @@ function initTheme() {
 
 function updateThemeColor() {
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-  document.querySelector('meta[name="theme-color"]').content = isDark ? '#0F172A' : '#FFFFFF';
+  document.querySelector('meta[name="theme-color"]').content = isDark ? '#0E1218' : '#F9F5EF';
 }
 
 // ── Service Worker registration ──

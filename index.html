@@ -93,6 +93,7 @@
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
       overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* ── Header Bar ── */
@@ -414,6 +415,7 @@
       display: inline-block;
       transform-origin: 0 0;
       transition: transform 0.15s ease-out;
+      will-change: transform;
     }
 
     /* ── Treant Connector Lines ── */
@@ -702,8 +704,8 @@
       }
 
       .stat-pill {
-        font-size: 0.5625rem;
-        padding: 2px 8px;
+        font-size: 0.625rem;
+        padding: 3px 8px;
       }
 
       .scroll-wrapper {
@@ -723,6 +725,95 @@
         right: 16px;
         transform: none;
         text-align: center;
+      }
+    }
+
+    /* ── Responsive: Very small phones (360px and below) ── */
+    @media (max-width: 360px) {
+      .site-header {
+        gap: 6px;
+        padding: 0 10px;
+        padding-top: env(safe-area-inset-top);
+      }
+
+      .header-left {
+        gap: 6px;
+      }
+
+      .header-icon {
+        width: 28px;
+        height: 28px;
+        border-radius: 5px;
+      }
+
+      .header-icon svg {
+        width: 13px;
+        height: 13px;
+      }
+
+      .header-title {
+        font-size: 0.875rem;
+      }
+
+      .header-right {
+        gap: 6px;
+      }
+
+      .search-container {
+        width: 100px;
+      }
+
+      .search-input {
+        padding: 8px 30px 8px 30px;
+      }
+
+      .stats-bar {
+        gap: 6px;
+      }
+
+      .stat-pill {
+        font-size: 0.5625rem;
+        padding: 2px 6px;
+        gap: 4px;
+      }
+
+      .stat-pill svg {
+        width: 9px;
+        height: 9px;
+      }
+
+      .expand-toggle {
+        padding: 6px 8px;
+        min-height: 32px;
+        min-width: 32px;
+      }
+
+      .theme-toggle {
+        width: 30px;
+        height: 30px;
+      }
+
+      .scroll-wrapper {
+        padding: 12px max(6px, env(safe-area-inset-left)) max(28px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-right));
+      }
+
+      .Treant .node {
+        padding: 8px 10px;
+        min-width: 100px;
+        max-width: 170px;
+      }
+
+      .family-card .card-name {
+        font-size: 0.875rem;
+      }
+
+      .family-card .card-detail {
+        font-size: 0.625rem;
+      }
+
+      .zoom-controls {
+        bottom: max(8px, env(safe-area-inset-bottom));
+        right: max(8px, env(safe-area-inset-right));
       }
     }
 
@@ -812,10 +903,11 @@
         min-width: 36px;
       }
       .search-nav-btn {
-        width: 28px;
-        height: 28px;
-        min-width: 28px;
-        min-height: 28px;
+        width: 32px;
+        height: 32px;
+        min-width: 44px; /* Touch target meets 44px minimum */
+        min-height: 44px;
+        position: relative;
       }
     }
 
@@ -952,11 +1044,13 @@
         gap: 1px;
       }
       .zoom-btn {
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
+        min-width: 44px; /* Touch target */
+        min-height: 44px;
       }
       .zoom-level {
-        font-size: 0.5rem;
+        font-size: 0.5625rem;
       }
     }
 
@@ -1277,17 +1371,173 @@
     }
 
     @media (max-width: 480px) {
+      .password-gate {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: max(60px, env(safe-area-inset-top, 60px));
+      }
+
       .gate-card {
-        padding: 36px 28px 28px;
+        padding: 32px 24px 24px;
       }
 
       .gate-title {
         font-size: 2.25rem;
       }
+
+      .gate-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+      }
+
+      .gate-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .gate-input {
+        font-size: 16px; /* Prevent iOS auto-zoom */
+        padding: 12px 16px;
+      }
+
+      .gate-submit {
+        min-height: 48px;
+        font-size: 0.8125rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .gate-card {
+        padding: 28px 20px 20px;
+      }
+
+      .gate-title {
+        font-size: 1.875rem;
+      }
+
+      .gate-eyebrow {
+        font-size: 0.5625rem;
+        margin-bottom: 20px;
+      }
+
+      .gate-subtitle {
+        font-size: 0.75rem;
+        margin-bottom: 20px;
+      }
+
+      .gate-ornament svg {
+        width: 90px;
+      }
+    }
+
+    @media (max-height: 500px) {
+      .password-gate {
+        align-items: flex-start;
+        padding-top: 16px;
+        overflow-y: auto;
+      }
+
+      .gate-card {
+        padding: 24px 24px 20px;
+      }
+
+      .gate-ornament {
+        margin-bottom: 12px;
+      }
+
+      .gate-icon {
+        margin-bottom: 12px;
+      }
+
+      .gate-title {
+        font-size: 1.75rem;
+        margin-bottom: 4px;
+      }
+
+      .gate-eyebrow {
+        margin-bottom: 16px;
+      }
+
+      .gate-subtitle {
+        margin-bottom: 16px;
+      }
     }
 
     @media print {
       .password-gate { display: none !important; }
+    }
+
+    /* ── Reduced Motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* ── Scroll-to-root button ── */
+    .scroll-to-root {
+      position: fixed;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow-zoom);
+      font-family: var(--font-body);
+      font-size: 0.6875rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      cursor: pointer;
+      z-index: 140;
+      min-height: 44px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .scroll-to-root.visible {
+      display: flex;
+    }
+
+    .scroll-to-root svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    @media (hover: hover) {
+      .scroll-to-root:hover {
+        background: var(--border);
+      }
+    }
+
+    .scroll-to-root:active {
+      background: var(--border-light);
+      transform: translateX(-50%) scale(0.97);
+    }
+
+    @media (min-width: 769px) {
+      .scroll-to-root {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .scroll-to-root {
+        bottom: max(64px, calc(env(safe-area-inset-bottom) + 52px));
+        padding: 8px 16px;
+        font-size: 0.625rem;
+      }
     }
 
     /* ── Print Stylesheet ── */
@@ -1474,6 +1724,12 @@
       <svg viewBox="0 0 512 512"><path d="M48.5 224H40c-13.3 0-24-10.7-24-24V72c0-9.7 5.8-18.5 14.8-22.2s19.3-1.7 26.2 5.2L98.6 96.6c87.6-86.5 228.7-86.2 315.8 1c87.5 87.5 87.5 229.3 0 316.8s-229.3 87.5-316.8 0c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0c62.5 62.5 163.8 62.5 226.3 0s62.5-163.8 0-226.3c-62.2-62.2-162.7-62.5-225.3-1L185 183c6.9 6.9 8.9 17.2 5.2 26.2s-12.5 14.8-22.2 14.8H48.5z"/></svg>
     </button>
   </div>
+
+  <!-- Scroll to root (mobile) -->
+  <button class="scroll-to-root" id="scrollToRoot">
+    <svg viewBox="0 0 384 512"><path d="M214.6 41.4c-12.5-12.5-32.8-12.5-45.3 0l-160 160c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 109.3 329.4 246.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3l-160-160z"/></svg>
+    Back to Root
+  </button>
 
   <!-- No results toast -->
   <div class="search-no-results" id="noResults">No matching members found</div>

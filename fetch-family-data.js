@@ -59,8 +59,10 @@ async function loadFamilyTree() {
       bindZoomControls();
       bindExpandToggle();
       bindDragToPan();
+      bindPinchZoom();
       bindBackButton();
       bindMinimap();
+      bindScrollToRoot();
     });
   } catch (err) {
     console.error('Failed to load family data', err);
@@ -590,6 +592,104 @@ function bindDragToPan() {
       isDragging = false;
       wrapper.classList.remove('is-dragging');
     }
+  });
+}
+
+// ── Pinch-to-zoom (mobile) ──
+function bindPinchZoom() {
+  const wrapper = document.getElementById('treeWrapper');
+  let initialDistance = 0;
+  let initialZoom = 1;
+
+  wrapper.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      initialDistance = getDistance(e.touches[0], e.touches[1]);
+      initialZoom = currentZoom;
+      wrapper.style.touchAction = 'none';
+    }
+  }, { passive: true });
+
+  wrapper.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = getDistance(e.touches[0], e.touches[1]);
+      const scale = dist / initialDistance;
+      setZoom(initialZoom * scale);
+    }
+  }, { passive: false });
+
+  wrapper.addEventListener('touchend', (e) => {
+    if (e.touches.length < 2) {
+      wrapper.style.touchAction = 'pan-x pan-y pinch-zoom';
+    }
+  }, { passive: true });
+
+  // Double-tap to zoom in/reset (only on empty space, not on nodes)
+  let lastTap = 0;
+  wrapper.addEventListener('touchend', (e) => {
+    if (e.touches.length > 0) return;
+    // Skip double-tap on interactive elements
+    const target = e.target;
+    if (target.closest('.node, .collapse-switch, button, input, a')) {
+      lastTap = 0;
+      return;
+    }
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      e.preventDefault();
+      if (currentZoom > 1.05) {
+        setZoom(1);
+      } else {
+        // Zoom to 1.5x centered on tap point
+        setZoom(1.5);
+        const touch = e.changedTouches[0];
+        const rect = wrapper.getBoundingClientRect();
+        const tapX = touch.clientX - rect.left + wrapper.scrollLeft;
+        const tapY = touch.clientY - rect.top + wrapper.scrollTop;
+        wrapper.scrollLeft = tapX * 1.5 - wrapper.clientWidth / 2;
+        wrapper.scrollTop = tapY * 1.5 - wrapper.clientHeight / 2;
+      }
+      lastTap = 0;
+    } else {
+      lastTap = now;
+    }
+  });
+}
+
+function getDistance(touch1, touch2) {
+  const dx = touch1.clientX - touch2.clientX;
+  const dy = touch1.clientY - touch2.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+// ── Scroll-to-root (mobile) ──
+function bindScrollToRoot() {
+  if (window.innerWidth > 768) return;
+
+  const btn = document.getElementById('scrollToRoot');
+  const wrapper = document.getElementById('treeWrapper');
+
+  // Show/hide based on scroll position
+  let scrollTimer;
+  wrapper.addEventListener('scroll', () => {
+    clearTimeout(scrollTimer);
+    scrollTimer = setTimeout(() => {
+      const scrolled = wrapper.scrollTop > 150 || wrapper.scrollLeft > 150;
+      btn.classList.toggle('visible', scrolled);
+    }, 100);
+  }, { passive: true });
+
+  btn.addEventListener('click', () => {
+    wrapper.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+    btn.classList.remove('visible');
+  });
+
+  // Re-evaluate on orientation change
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      // Recalculate scroll position after orientation settles
+      btn.classList.toggle('visible', wrapper.scrollTop > 150 || wrapper.scrollLeft > 150);
+    }, 300);
   });
 }
 

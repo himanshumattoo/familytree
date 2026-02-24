@@ -1,9 +1,9 @@
-const CACHE_NAME = 'family-tree-v1';
+const CACHE_NAME = 'family-tree-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/fetch-family-data.js',
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+  'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap',
   'https://cdn.jsdelivr.net/gh/fperucic/treant-js/Treant.css',
   'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
   'https://cdn.jsdelivr.net/gh/fperucic/treant-js/vendor/raphael.js',

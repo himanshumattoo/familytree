@@ -58,11 +58,14 @@ async function loadFamilyTree() {
       bindBreadcrumbs();
       bindZoomControls();
       bindExpandToggle();
-      bindDragToPan();
-      bindPinchZoom();
+      bindPointerGestures();
       bindBackButton();
       bindMinimap();
       bindScrollToRoot();
+      // Auto-fit tree to viewport on mobile for immediate visibility
+      if (window.innerWidth <= 768) {
+        setTimeout(zoomToFit, 300);
+      }
     });
   } catch (err) {
     console.error('Failed to load family data', err);
@@ -185,14 +188,22 @@ function updateStats(stats) {
 // ── Click handling ──
 function bindNodeClicks() {
   const container = document.querySelector('#tree-simple');
+  const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
   container.addEventListener('click', e => {
     const nodeEl = e.target.closest('.node');
-    if (nodeEl && !e.target.classList.contains('collapse-switch')) {
-      const toggle = nodeEl.querySelector('.collapse-switch');
-      if (toggle) {
-        pushTreeState();
-        toggle.click();
-      }
+    if (!nodeEl || e.target.classList.contains('collapse-switch')) return;
+
+    // On mobile, toggle card detail visibility
+    if (isMobile) {
+      const card = nodeEl.querySelector('.family-card');
+      if (card) card.classList.toggle('expanded');
+    }
+
+    const toggle = nodeEl.querySelector('.collapse-switch');
+    if (toggle) {
+      pushTreeState();
+      toggle.click();
     }
   });
 }
@@ -398,10 +409,22 @@ function toggleExpandAll() {
 }
 
 // ── Zoom controls ──
-function setZoom(level) {
-  currentZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, level));
+function setZoom(level, focalX, focalY) {
+  const wrapper = document.getElementById('treeWrapper');
   const tree = document.getElementById('tree-simple');
+  const oldZoom = currentZoom;
+  currentZoom = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, level));
+
+  // Focal-point zoom: keep the point under (focalX, focalY) stationary
+  const cx = focalX !== undefined ? focalX : wrapper.clientWidth / 2;
+  const cy = focalY !== undefined ? focalY : wrapper.clientHeight / 2;
+  const contentX = (wrapper.scrollLeft + cx) / oldZoom;
+  const contentY = (wrapper.scrollTop + cy) / oldZoom;
+
   tree.style.transform = `scale(${currentZoom})`;
+  wrapper.scrollLeft = contentX * currentZoom - cx;
+  wrapper.scrollTop = contentY * currentZoom - cy;
+
   document.getElementById('zoomLevel').textContent = Math.round(currentZoom * 100) + '%';
   document.getElementById('zoomIn').disabled = currentZoom >= ZOOM_MAX;
   document.getElementById('zoomOut').disabled = currentZoom <= ZOOM_MIN;
@@ -413,6 +436,7 @@ function zoomToFit() {
   // Temporarily reset scale to measure natural size
   tree.style.transition = 'none';
   tree.style.transform = 'scale(1)';
+  currentZoom = 1; // sync state so setZoom's focal-point math is correct
   const treeW = tree.scrollWidth;
   const treeH = tree.scrollHeight;
   tree.style.transition = '';
@@ -434,13 +458,14 @@ function bindZoomControls() {
   document.getElementById('zoomReset').addEventListener('click', () => setZoom(1));
   document.getElementById('zoomFit').addEventListener('click', zoomToFit);
 
-  // Ctrl+scroll / Cmd+scroll to zoom on desktop
+  // Ctrl+scroll / Cmd+scroll to zoom on desktop (focal point at cursor)
   const wrapper = document.getElementById('treeWrapper');
   wrapper.addEventListener('wheel', (e) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
       const delta = e.deltaY > 0 ? -ZOOM_STEP : ZOOM_STEP;
-      setZoom(currentZoom + delta);
+      const rect = wrapper.getBoundingClientRect();
+      setZoom(currentZoom + delta, e.clientX - rect.left, e.clientY - rect.top);
     }
   }, { passive: false });
 }
@@ -553,113 +578,169 @@ function bindMinimap() {
   setTimeout(updateMinimap, 500);
   // Also update when zoom changes
   const origSetZoom = setZoom;
-  setZoom = function(level) {
-    origSetZoom(level);
+  setZoom = function(level, focalX, focalY) {
+    origSetZoom(level, focalX, focalY);
     setTimeout(updateMinimap, 200);
   };
 }
 
-// ── Drag-to-pan (desktop) ──
-function bindDragToPan() {
+// ── Unified pointer-driven pan, pinch-zoom, inertia & double-tap ──
+function bindPointerGestures() {
   const wrapper = document.getElementById('treeWrapper');
-  let isDragging = false;
-  let startX, startY, scrollLeft, scrollTop;
+  const pointers = new Map();
 
-  wrapper.addEventListener('mousedown', (e) => {
-    // Only pan on primary button, and not on interactive elements
-    if (e.button !== 0) return;
-    if (e.target.closest('.node, .collapse-switch, button, input, a')) return;
+  // Pan state
+  let isPanning = false;
+  let panStartX = 0, panStartY = 0;
+  let panScrollLeft = 0, panScrollTop = 0;
 
-    isDragging = true;
-    wrapper.classList.add('is-dragging');
-    startX = e.clientX;
-    startY = e.clientY;
-    scrollLeft = wrapper.scrollLeft;
-    scrollTop = wrapper.scrollTop;
-    e.preventDefault();
-  });
+  // Velocity / inertia
+  let velocityX = 0, velocityY = 0, lastMoveTime = 0;
+  let inertiaFrame = null;
 
-  document.addEventListener('mousemove', (e) => {
-    if (!isDragging) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    wrapper.scrollLeft = scrollLeft - dx;
-    wrapper.scrollTop = scrollTop - dy;
-  });
+  // Pinch state
+  let isPinching = false;
+  let pinchStartDist = 0;
+  let pinchStartZoom = 1;
 
-  document.addEventListener('mouseup', () => {
-    if (isDragging) {
-      isDragging = false;
+  // Double-tap state (touch only)
+  let lastTapTime = 0;
+  let tapDownX = 0, tapDownY = 0, tapDownTime = 0;
+
+  function cancelInertia() {
+    if (inertiaFrame) { cancelAnimationFrame(inertiaFrame); inertiaFrame = null; }
+  }
+
+  function pDist(a, b) {
+    const dx = a.x - b.x, dy = a.y - b.y;
+    return Math.sqrt(dx * dx + dy * dy);
+  }
+
+  wrapper.addEventListener('pointerdown', (e) => {
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    cancelInertia();
+
+    const onInteractive = e.target.closest('.node, .collapse-switch, button, input, a');
+
+    if (pointers.size === 1 && !onInteractive) {
+      isPanning = true;
+      wrapper.setPointerCapture(e.pointerId);
+      panStartX = e.clientX;
+      panStartY = e.clientY;
+      panScrollLeft = wrapper.scrollLeft;
+      panScrollTop = wrapper.scrollTop;
+      velocityX = 0;
+      velocityY = 0;
+      lastMoveTime = performance.now();
+      tapDownX = e.clientX;
+      tapDownY = e.clientY;
+      tapDownTime = Date.now();
+      wrapper.classList.add('is-dragging');
+    }
+
+    if (pointers.size === 2) {
+      // Switch to pinch
+      isPanning = false;
+      isPinching = true;
       wrapper.classList.remove('is-dragging');
-    }
-  });
-}
-
-// ── Pinch-to-zoom (mobile) ──
-function bindPinchZoom() {
-  const wrapper = document.getElementById('treeWrapper');
-  let initialDistance = 0;
-  let initialZoom = 1;
-
-  wrapper.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-      initialDistance = getDistance(e.touches[0], e.touches[1]);
-      initialZoom = currentZoom;
-      wrapper.style.touchAction = 'none';
-    }
-  }, { passive: true });
-
-  wrapper.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2) {
-      e.preventDefault();
-      const dist = getDistance(e.touches[0], e.touches[1]);
-      const scale = dist / initialDistance;
-      setZoom(initialZoom * scale);
-    }
-  }, { passive: false });
-
-  wrapper.addEventListener('touchend', (e) => {
-    if (e.touches.length < 2) {
-      wrapper.style.touchAction = 'pan-x pan-y pinch-zoom';
-    }
-  }, { passive: true });
-
-  // Double-tap to zoom in/reset (only on empty space, not on nodes)
-  let lastTap = 0;
-  wrapper.addEventListener('touchend', (e) => {
-    if (e.touches.length > 0) return;
-    // Skip double-tap on interactive elements
-    const target = e.target;
-    if (target.closest('.node, .collapse-switch, button, input, a')) {
-      lastTap = 0;
-      return;
-    }
-    const now = Date.now();
-    if (now - lastTap < 300) {
-      e.preventDefault();
-      if (currentZoom > 1.05) {
-        setZoom(1);
-      } else {
-        // Zoom to 1.5x centered on tap point
-        setZoom(1.5);
-        const touch = e.changedTouches[0];
-        const rect = wrapper.getBoundingClientRect();
-        const tapX = touch.clientX - rect.left + wrapper.scrollLeft;
-        const tapY = touch.clientY - rect.top + wrapper.scrollTop;
-        wrapper.scrollLeft = tapX * 1.5 - wrapper.clientWidth / 2;
-        wrapper.scrollTop = tapY * 1.5 - wrapper.clientHeight / 2;
+      const pts = Array.from(pointers.values());
+      pinchStartDist = pDist(pts[0], pts[1]);
+      pinchStartZoom = currentZoom;
+      for (const id of pointers.keys()) {
+        try { wrapper.setPointerCapture(id); } catch (_) {}
       }
-      lastTap = 0;
-    } else {
-      lastTap = now;
     }
   });
-}
 
-function getDistance(touch1, touch2) {
-  const dx = touch1.clientX - touch2.clientX;
-  const dy = touch1.clientY - touch2.clientY;
-  return Math.sqrt(dx * dx + dy * dy);
+  wrapper.addEventListener('pointermove', (e) => {
+    if (!pointers.has(e.pointerId)) return;
+    const prev = pointers.get(e.pointerId);
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (isPanning && pointers.size === 1) {
+      const now = performance.now();
+      const dt = now - lastMoveTime;
+      if (dt > 0) {
+        velocityX = (e.clientX - prev.x) / dt * 16;
+        velocityY = (e.clientY - prev.y) / dt * 16;
+      }
+      lastMoveTime = now;
+      wrapper.scrollLeft = panScrollLeft - (e.clientX - panStartX);
+      wrapper.scrollTop = panScrollTop - (e.clientY - panStartY);
+    } else if (isPinching && pointers.size === 2) {
+      e.preventDefault();
+      const pts = Array.from(pointers.values());
+      const dist = pDist(pts[0], pts[1]);
+      const scale = dist / pinchStartDist;
+      const rect = wrapper.getBoundingClientRect();
+      const fx = (pts[0].x + pts[1].x) / 2 - rect.left;
+      const fy = (pts[0].y + pts[1].y) / 2 - rect.top;
+      setZoom(pinchStartZoom * scale, fx, fy);
+    }
+  });
+
+  function onPointerEnd(e) {
+    pointers.delete(e.pointerId);
+    try { wrapper.releasePointerCapture(e.pointerId); } catch (_) {}
+
+    if (pointers.size === 0) {
+      if (isPanning) {
+        isPanning = false;
+        wrapper.classList.remove('is-dragging');
+
+        // Inertia coast
+        if (Math.abs(velocityX) > 0.5 || Math.abs(velocityY) > 0.5) {
+          (function coast() {
+            velocityX *= 0.92;
+            velocityY *= 0.92;
+            wrapper.scrollLeft -= velocityX;
+            wrapper.scrollTop -= velocityY;
+            if (Math.abs(velocityX) > 0.5 || Math.abs(velocityY) > 0.5) {
+              inertiaFrame = requestAnimationFrame(coast);
+            } else { inertiaFrame = null; }
+          })();
+        }
+
+        // Double-tap detection (touch only, empty space only)
+        if (e.pointerType === 'touch') {
+          const dt = Date.now() - tapDownTime;
+          const dx = Math.abs(e.clientX - tapDownX);
+          const dy = Math.abs(e.clientY - tapDownY);
+          if (dt < 300 && dx < 10 && dy < 10) {
+            const now = Date.now();
+            if (now - lastTapTime < 350) {
+              const rect = wrapper.getBoundingClientRect();
+              const fx = e.clientX - rect.left;
+              const fy = e.clientY - rect.top;
+              setZoom(currentZoom > 1.05 ? 1 : 1.5, fx, fy);
+              lastTapTime = 0;
+            } else {
+              lastTapTime = now;
+            }
+          }
+        }
+      }
+      isPinching = false;
+    } else if (pointers.size === 1 && isPinching) {
+      // Transitioned from pinch → single pointer: start panning
+      isPinching = false;
+      isPanning = true;
+      const p = Array.from(pointers.values())[0];
+      const id = Array.from(pointers.keys())[0];
+      panStartX = p.x;
+      panStartY = p.y;
+      panScrollLeft = wrapper.scrollLeft;
+      panScrollTop = wrapper.scrollTop;
+      velocityX = 0;
+      velocityY = 0;
+      lastMoveTime = performance.now();
+      try { wrapper.setPointerCapture(id); } catch (_) {}
+      wrapper.classList.add('is-dragging');
+    }
+  }
+
+  wrapper.addEventListener('pointerup', onPointerEnd);
+  wrapper.addEventListener('pointercancel', onPointerEnd);
 }
 
 // ── Scroll-to-root (mobile) ──

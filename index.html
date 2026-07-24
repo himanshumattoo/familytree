@@ -85,6 +85,11 @@
       --toast-text: #0E1218;
     }
 
+    html {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       font-family: var(--font-body);
       background-color: var(--bg);
@@ -94,6 +99,13 @@
       text-rendering: optimizeLegibility;
       overscroll-behavior: none;
       -webkit-tap-highlight-color: transparent;
+      /* Single scrolling surface: the page itself never scrolls, only .scroll-wrapper does.
+         This stops the tree's pan gesture from also dragging the whole document. */
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
     }
 
     /* ── Header Bar ── */
@@ -101,12 +113,13 @@
       position: sticky;
       top: 0;
       z-index: 100;
+      flex-shrink: 0;
       background: var(--bg-card);
       border-bottom: 1px solid var(--border);
       box-shadow: var(--shadow-header);
       padding: 0 max(24px, env(safe-area-inset-left)) 0 max(24px, env(safe-area-inset-right));
       padding-top: env(safe-area-inset-top);
-      height: calc(64px + env(safe-area-inset-top));
+      min-height: calc(64px + env(safe-area-inset-top));
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -267,6 +280,7 @@
       font-weight: 400;
       color: var(--text-faint);
       display: none;
+      flex-shrink: 0;
       align-items: center;
       gap: 6px;
       min-height: 36px;
@@ -307,8 +321,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: calc(100vh - 64px);
-      height: calc(100dvh - 64px);
+      flex: 1;
+      min-height: 0;
       gap: 20px;
     }
 
@@ -339,8 +353,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      height: calc(100vh - 64px);
-      height: calc(100dvh - 64px);
+      flex: 1;
+      min-height: 0;
       gap: 12px;
     }
 
@@ -386,8 +400,8 @@
       overflow-x: auto;
       overflow-y: auto;
       width: 100%;
-      height: calc(100vh - 64px - env(safe-area-inset-top));
-      height: calc(100dvh - 64px - env(safe-area-inset-top));
+      flex: 1;
+      min-height: 0;
       touch-action: none; /* We handle all touch gestures via Pointer Events */
       overscroll-behavior: contain;
       padding: 32px max(24px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
@@ -598,7 +612,7 @@
       .site-header {
         padding: 0 16px;
         padding-top: env(safe-area-inset-top);
-        height: calc(56px + env(safe-area-inset-top));
+        min-height: calc(56px + env(safe-area-inset-top));
         gap: 12px;
         flex-wrap: wrap;
       }
@@ -636,8 +650,6 @@
       }
 
       .scroll-wrapper {
-        height: calc(100vh - 86px - env(safe-area-inset-top));
-        height: calc(100dvh - 86px - env(safe-area-inset-top));
         padding: 20px max(12px, env(safe-area-inset-left)) max(40px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-right));
       }
 
@@ -717,8 +729,6 @@
       }
 
       .scroll-wrapper {
-        height: calc(100vh - 94px - env(safe-area-inset-top));
-        height: calc(100dvh - 94px - env(safe-area-inset-top));
         padding: 16px max(8px, env(safe-area-inset-left)) max(32px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
       }
 
@@ -828,7 +838,7 @@
     /* ── Responsive: Landscape phones ── */
     @media (max-height: 480px) and (orientation: landscape) {
       .site-header {
-        height: calc(44px + env(safe-area-inset-top));
+        min-height: calc(44px + env(safe-area-inset-top));
         flex-wrap: nowrap;
       }
 
@@ -839,8 +849,6 @@
       }
 
       .scroll-wrapper {
-        height: calc(100vh - 44px - env(safe-area-inset-top));
-        height: calc(100dvh - 44px - env(safe-area-inset-top));
         padding: 12px max(12px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
       }
     }
@@ -1559,12 +1567,19 @@
         display: none !important;
       }
 
+      html, body {
+        height: auto !important;
+        overflow: visible !important;
+      }
+
       body {
+        display: block !important;
         background: #fff !important;
         color: #000 !important;
       }
 
       .scroll-wrapper {
+        flex: none !important;
         height: auto !important;
         overflow: visible !important;
         padding: 0 !important;

@@ -1,7 +1,5 @@
-const CACHE_NAME = 'family-tree-v2';
+const CACHE_NAME = 'family-tree-v3';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/fetch-family-data.js',
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Jost:wght@300;400;500;600&display=swap',
   'https://cdn.jsdelivr.net/gh/fperucic/treant-js/Treant.css',
@@ -33,8 +31,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // CSV data: stale-while-revalidate
-  if (url.hostname === 'docs.google.com') {
+  // Family data API: stale-while-revalidate
+  if (url.pathname === '/api/family-data') {
     event.respondWith(
       caches.open(CACHE_NAME).then((cache) =>
         cache.match(event.request).then((cached) => {
@@ -47,6 +45,21 @@ self.addEventListener('fetch', (event) => {
           return cached || networkFetch;
         })
       )
+    );
+    return;
+  }
+
+  // HTML documents: network-first so a stale cached shell can't mask a deploy
+  if (event.request.mode === 'navigate' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response.clone()));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }

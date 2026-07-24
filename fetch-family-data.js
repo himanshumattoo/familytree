@@ -849,8 +849,8 @@ function bindKeyboardShortcuts() {
 }
 
 // ── Password gate ──
-// Real auth now happens server-side in functions/api/login.js; this just
-// posts the password and relies on the httpOnly session cookie it sets.
+// Real auth happens server-side in lambda/index.js; this just posts the
+// password and relies on the httpOnly session cookie it sets.
 function initPasswordGate() {
   const gate = document.getElementById('passwordGate');
   const form = document.getElementById('gateForm');

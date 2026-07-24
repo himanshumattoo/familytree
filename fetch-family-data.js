@@ -1,7 +1,3 @@
-// Published Google Sheets CSV URL
-const CSV_URL =
-  'https://docs.google.com/spreadsheets/d/e/***REMOVED-SHEET-TOKEN***/pub?gid=0&single=true&output=csv';
-
 // ── UI element references ──
 const ui = {
   loading:   () => document.getElementById('loadingState'),
@@ -29,7 +25,11 @@ const ZOOM_STEP = 0.15;
 async function loadFamilyTree() {
   showLoading();
   try {
-    const response = await fetch(CSV_URL);
+    const response = await fetch('/api/family-data', { credentials: 'same-origin' });
+    if (response.status === 401) {
+      showPasswordGate();
+      return;
+    }
     if (!response.ok) throw new Error('Network response was not ok');
     const csvText = await response.text();
     const rows = Papa.parse(csvText, { header: true, skipEmptyLines: true }).data;
@@ -78,18 +78,28 @@ function showLoading() {
   ui.loading().style.display = 'flex';
   ui.error().style.display = 'none';
   ui.wrapper().style.display = 'none';
+  document.getElementById('passwordGate').hidden = true;
 }
 
 function showError() {
   ui.loading().style.display = 'none';
   ui.error().style.display = 'flex';
   ui.wrapper().style.display = 'none';
+  document.getElementById('passwordGate').hidden = true;
 }
 
 function showTree() {
   ui.loading().style.display = 'none';
   ui.error().style.display = 'none';
   ui.wrapper().style.display = '';
+  document.getElementById('passwordGate').hidden = true;
+}
+
+function showPasswordGate() {
+  ui.loading().style.display = 'none';
+  ui.error().style.display = 'none';
+  ui.wrapper().style.display = 'none';
+  document.getElementById('passwordGate').hidden = false;
 }
 
 // ── Card creation ──
@@ -839,46 +849,47 @@ function bindKeyboardShortcuts() {
 }
 
 // ── Password gate ──
-// SHA-256 hash of the password "***REMOVED-PASSWORD***"
-const PASSWORD_HASH = '***REMOVED-HASH***';
-
-async function sha256(text) {
-  const data = new TextEncoder().encode(text);
-  const hash = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
-
+// Real auth now happens server-side in functions/api/login.js; this just
+// posts the password and relies on the httpOnly session cookie it sets.
 function initPasswordGate() {
   const gate = document.getElementById('passwordGate');
   const form = document.getElementById('gateForm');
   const input = document.getElementById('gateInput');
   const error = document.getElementById('gateError');
 
-  // Check if already authenticated this session
-  if (sessionStorage.getItem('authenticated') === '1') {
-    gate.hidden = true;
-    return true;
-  }
-
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    const hash = await sha256(input.value);
-    if (hash === PASSWORD_HASH) {
-      sessionStorage.setItem('authenticated', '1');
-      gate.hidden = true;
-      loadFamilyTree();
-    } else {
-      error.textContent = 'Incorrect password. Please try again.';
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.disabled = true;
+
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: input.value }),
+      });
+
+      if (res.ok) {
+        gate.hidden = true;
+        loadFamilyTree();
+        return;
+      }
+
+      const data = await res.json().catch(() => ({}));
+      error.textContent = res.status === 429
+        ? 'Too many attempts. Please wait a few minutes and try again.'
+        : (data.error || 'Incorrect password. Please try again.');
       input.value = '';
       input.focus();
       form.classList.remove('shake');
       void form.offsetWidth; // reflow to restart animation
       form.classList.add('shake');
       setTimeout(() => form.classList.remove('shake'), 600);
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
-
-  return false;
 }
 
 // ── Dark mode ──
@@ -914,10 +925,8 @@ if ('serviceWorker' in navigator) {
 // ── Boot ──
 document.addEventListener('DOMContentLoaded', () => {
   initTheme();
-  const authenticated = initPasswordGate();
-  if (authenticated) {
-    loadFamilyTree();
-  }
+  initPasswordGate();
+  loadFamilyTree(); // shows the password gate itself if the session isn't authenticated
   ui.retry().addEventListener('click', loadFamilyTree);
   bindKeyboardShortcuts();
 });

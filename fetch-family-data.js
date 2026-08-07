@@ -447,16 +447,44 @@ function zoomToFit() {
   tree.style.transition = 'none';
   tree.style.transform = 'scale(1)';
   currentZoom = 1; // sync state so setZoom's focal-point math is correct
-  const treeW = tree.scrollWidth;
-  const treeH = tree.scrollHeight;
+
+  // Measure only the bounding box of currently-visible nodes. Collapsed
+  // subtrees stay in the layout (Treant hides them with visibility:hidden,
+  // not display:none), so tree.scrollWidth/scrollHeight reflect the size of
+  // the *entire* tree rather than what's actually on screen — fitting to
+  // that produces a wildly over-shrunk view on a fresh page load.
+  const treeRect = tree.getBoundingClientRect();
+  const visibleNodes = Array.from(tree.querySelectorAll('.node'))
+    .filter(n => getComputedStyle(n).visibility !== 'hidden');
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  visibleNodes.forEach(n => {
+    const r = n.getBoundingClientRect();
+    minX = Math.min(minX, r.left - treeRect.left);
+    minY = Math.min(minY, r.top - treeRect.top);
+    maxX = Math.max(maxX, r.right - treeRect.left);
+    maxY = Math.max(maxY, r.bottom - treeRect.top);
+  });
   tree.style.transition = '';
+
+  if (!visibleNodes.length || !isFinite(minX)) {
+    setZoom(1);
+    return;
+  }
+
+  const treeW = maxX - minX;
+  const treeH = maxY - minY;
   const wrapperW = wrapper.clientWidth - 48; // account for padding
   const wrapperH = wrapper.clientHeight - 48;
   const fit = Math.min(wrapperW / treeW, wrapperH / treeH, 1);
   setZoom(fit);
-  // Center the tree after fitting
-  wrapper.scrollLeft = 0;
-  wrapper.scrollTop = 0;
+
+  // Scroll so the visible bounding box starts at the top-left of the
+  // viewport. Treant nodes are absolutely positioned within a container
+  // sized for the *entire* tree, so the visible ones are rarely anywhere
+  // near its (0, 0) — plain CSS centering can't reach absolutely
+  // positioned content, so this has to be done via scroll offset.
+  wrapper.scrollTop = Math.max(0, minY * fit);
+  wrapper.scrollLeft = Math.max(0, minX * fit);
 }
 
 function bindZoomControls() {

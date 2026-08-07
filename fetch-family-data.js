@@ -66,6 +66,7 @@ async function loadFamilyTree() {
       if (window.innerWidth <= 768) {
         setTimeout(zoomToFit, 300);
       }
+      maybeShowFirstRunHint();
     });
   } catch (err) {
     console.error('Failed to load family data', err);
@@ -202,18 +203,33 @@ function bindNodeClicks() {
 
   container.addEventListener('click', e => {
     const nodeEl = e.target.closest('.node');
-    if (!nodeEl || e.target.classList.contains('collapse-switch')) return;
+    if (!nodeEl) return;
 
-    // On mobile, toggle card detail visibility
-    if (isMobile) {
-      const card = nodeEl.querySelector('.family-card');
-      if (card) card.classList.toggle('expanded');
-    }
+    const switchEl = nodeEl.querySelector('.collapse-switch');
+    const card = nodeEl.querySelector('.family-card');
 
-    const toggle = nodeEl.querySelector('.collapse-switch');
-    if (toggle) {
-      pushTreeState();
-      toggle.click();
+    if (switchEl) {
+      // Node has children. A tap = open/close this person: it expands (or
+      // collapses) their children, and on mobile reveals (or hides) their
+      // details in step — one predictable action per tap, instead of the
+      // old behaviour where a tap flipped details and children on
+      // independent cycles that drifted out of sync.
+      const tappedSwitch = !!e.target.closest('.collapse-switch');
+      if (!tappedSwitch) {
+        pushTreeState();
+        switchEl.click(); // toggle children via Treant's own handler
+      }
+      if (isMobile && card) {
+        // Sync detail visibility to the resulting expanded state, whichever
+        // control was used (the card body or the +/- switch itself).
+        requestAnimationFrame(() => {
+          card.classList.toggle('expanded', !nodeEl.classList.contains('collapsed'));
+        });
+      }
+    } else if (isMobile && card) {
+      // Leaf node: nothing to expand, so a tap just shows/hides this
+      // person's own details.
+      card.classList.toggle('expanded');
     }
   });
 }
@@ -779,6 +795,43 @@ function bindPointerGestures() {
 
   wrapper.addEventListener('pointerup', onPointerEnd);
   wrapper.addEventListener('pointercancel', onPointerEnd);
+}
+
+// ── First-run hint (shown once per browser) ──
+function maybeShowFirstRunHint() {
+  if (localStorage.getItem('ft_hint_seen')) return;
+  const hint = document.getElementById('firstRunHint');
+  const wrapper = document.getElementById('treeWrapper');
+  if (!hint || !wrapper) return;
+
+  let dismissed = false;
+  let timer = null;
+  // Stamp the settle-window start synchronously so a stray event arriving
+  // before the rAF below can't slip past the guard (shownAt would still be 0
+  // and performance.now() - 0 would always exceed the threshold).
+  let shownAt = performance.now();
+  function dismiss() {
+    if (dismissed) return;
+    dismissed = true;
+    localStorage.setItem('ft_hint_seen', '1');
+    hint.classList.remove('visible');
+    clearTimeout(timer);
+    wrapper.removeEventListener('pointerdown', onInteract);
+    hint.removeEventListener('click', onInteract);
+  }
+  function onInteract() {
+    // Ignore stray click/pointer events fired as the tree lays out and
+    // auto-fits; only a deliberate interaction after the hint has been up a
+    // beat should dismiss it (otherwise it can flash and vanish on load).
+    if (performance.now() - shownAt < 600) return;
+    dismiss();
+  }
+
+  requestAnimationFrame(() => hint.classList.add('visible'));
+  timer = setTimeout(dismiss, 7000);
+  // Any deliberate interaction — tapping the hint or the tree — dismisses it.
+  hint.addEventListener('click', onInteract);
+  wrapper.addEventListener('pointerdown', onInteract);
 }
 
 // ── Scroll-to-root (mobile) ──
